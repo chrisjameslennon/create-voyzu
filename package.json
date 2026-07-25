@@ -1,0 +1,33 @@
+{
+  "name": "create-voyzu",
+  "version": "0.1.0",
+  "description": "Create a new Voyzu application from the chrisjameslennon/voyzu GitHub repository.",
+  "type": "module",
+  "bin": {
+    "create-voyzu": "./bin/create-voyzu.js"
+  },
+  "files": [
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "voyzu",
+    "erp",
+    "nextjs",
+    "initializer",
+    "scaffold"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisjameslennon/create-voyzu.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chrisjameslennon/create-voyzu/issues"
+  },
+  "homepage": "https://github.com/chrisjameslennon/create-voyzu#readme"
+}
