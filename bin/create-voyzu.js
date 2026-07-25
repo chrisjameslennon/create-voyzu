@@ -15,7 +15,9 @@ import process from "node:process";
 
 const REPOSITORY_OWNER = "chrisjameslennon";
 const REPOSITORY_NAME = "voyzu";
-const DEFAULT_REF = "main";
+const DEFAULT_REF = process.env.VOYZU_REF || "main";
+const LOCAL_SOURCE_DIRECTORY = process.env.VOYZU_SOURCE_DIR;
+const LOCAL_SOURCE_REF = process.env.VOYZU_SOURCE_REF || "HEAD";
 
 function run(command, args, options = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -107,14 +109,29 @@ async function main() {
 
     await mkdir(extractPath);
 
-    const archiveUrl =
-      `https://github.com/${REPOSITORY_OWNER}/${REPOSITORY_NAME}` +
-      `/archive/refs/heads/${DEFAULT_REF}.tar.gz`;
-
     console.log(`Creating ${projectName}...`);
-    console.log("Downloading Voyzu...");
 
-    await downloadFile(archiveUrl, archivePath);
+    if (LOCAL_SOURCE_DIRECTORY) {
+      console.log("Archiving local Voyzu checkout...");
+      await run(
+        "git",
+        [
+          "archive",
+          "--format=tar.gz",
+          "--prefix=voyzu-local/",
+          `--output=${archivePath}`,
+          LOCAL_SOURCE_REF,
+        ],
+        { cwd: resolve(LOCAL_SOURCE_DIRECTORY) },
+      );
+    } else {
+      const archiveUrl =
+        `https://github.com/${REPOSITORY_OWNER}/${REPOSITORY_NAME}` +
+        `/archive/refs/heads/${DEFAULT_REF}.tar.gz`;
+
+      console.log("Downloading Voyzu...");
+      await downloadFile(archiveUrl, archivePath);
+    }
 
     console.log("Extracting project...");
 
