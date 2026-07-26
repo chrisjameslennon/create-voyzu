@@ -100,19 +100,29 @@ try {
   );
   await run("npm", ["run", "build"], { cwd: generatedProject });
 
-  const installedLink = join(
+  const installedModules = join(
     generatedProject,
     ".run/voyzu/packages/@voyzu-modules",
   );
-  if (!(await lstat(installedLink)).isSymbolicLink()) {
-    throw new Error("Virgin installation did not create the modules link.");
+  const installedModulesStat = await lstat(installedModules);
+  if (
+    !installedModulesStat.isDirectory()
+    || installedModulesStat.isSymbolicLink()
+  ) {
+    throw new Error("Virgin installation did not copy the modules directory.");
   }
-  const installedModules = join(
+  const clonedModules = join(
     generatedProject,
     ".run/voyzu-modules/packages/@voyzu-modules",
   );
-  if ((await realpath(installedLink)) !== (await realpath(installedModules))) {
-    throw new Error("Virgin installation modules link has the wrong target.");
+  if ((await realpath(installedModules)) === (await realpath(clonedModules))) {
+    throw new Error("Virgin installation modules directory is still linked.");
+  }
+  if (!(await readFile(
+    join(installedModules, "all-modules/package.json"),
+    "utf8",
+  )).includes('"@voyzu-modules/all-modules"')) {
+    throw new Error("Virgin installation did not copy the module contents.");
   }
 
   await run(process.execPath, [cliPath, "dev", "--skip-install"], {

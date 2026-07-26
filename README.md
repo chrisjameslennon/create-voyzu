@@ -96,15 +96,22 @@ npm run create-dev -- --force
 ## Combined filesystem layout
 
 Voyzu Platform and Voyzu Modules retain their existing package and import
-structure. The installer recreates that structure with a directory link:
+structure.
 
 ```text
 <voyzu-runtime>/packages/@voyzu-modules
-    -> <voyzu-modules>/packages/@voyzu-modules
 ```
 
-On Windows this is a directory junction. On macOS and Linux it is a symbolic
-link. No environment-based module loader or discovery mechanism is used.
+For a virgin installation, the module directory is copied into the Voyzu
+runtime. This makes production builds portable across Git, deployment tools,
+archives, containers, and operating systems.
+
+For module development, the current `voyzu-modules/packages/@voyzu-modules`
+directory is linked into `.dev/voyzu/packages/@voyzu-modules`. Windows uses a
+directory junction; macOS and Linux use a symbolic link. Edits are therefore
+immediately visible to the development application.
+
+No environment-based module loader or discovery mechanism is used.
 
 ## Git refs
 

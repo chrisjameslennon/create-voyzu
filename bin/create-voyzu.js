@@ -4,6 +4,7 @@ import { spawn } from "node:child_process";
 import {
   access,
   appendFile,
+  cp,
   mkdir,
   readFile,
   readdir,
@@ -171,6 +172,21 @@ async function linkModulesIntoVoyzu(platformDirectory, modulesDirectory) {
   );
 }
 
+async function copyModulesIntoVoyzu(platformDirectory, modulesDirectory) {
+  const source = join(modulesDirectory, "packages", "@voyzu-modules");
+  const target = join(platformDirectory, "packages", "@voyzu-modules");
+
+  if (!(await pathExists(source))) {
+    throw new Error(
+      `Voyzu Modules package directory was not found: ${source}`,
+    );
+  }
+
+  await rm(target, { recursive: true, force: true });
+  await mkdir(dirname(target), { recursive: true });
+  await cp(source, target, { recursive: true });
+}
+
 function runtimeRunnerSource(platformDirectory) {
   return `#!/usr/bin/env node
 
@@ -280,8 +296,8 @@ async function createVirginInstall(options) {
       label: "Voyzu Modules",
     });
 
-    console.log("Linking Voyzu Modules into Voyzu...");
-    await linkModulesIntoVoyzu(platformDirectory, modulesDirectory);
+    console.log("Copying Voyzu Modules into Voyzu...");
+    await copyModulesIntoVoyzu(platformDirectory, modulesDirectory);
 
     if (!options.skipInstall) {
       await installDependencies(platformDirectory, "Voyzu");
