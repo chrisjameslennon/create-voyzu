@@ -6,7 +6,8 @@
     "build": "npm --prefix .run/voyzu run build",
     "prestart": "npm run build",
     "start": "npm --prefix .run/voyzu run start",
-    "update": "node ./scripts/update-voyzu.mjs"
+    "update": "node ./scripts/update-voyzu.mjs",
+    "re-install": "node ./scripts/re-install-voyzu.mjs"
   },
   "voyzu": {
     "platform": {

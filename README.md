@@ -7,17 +7,13 @@ Creates Voyzu installations and module-development runtimes directly from GitHub
 ## Create a virgin installation
 
 ```shell
-npm exec --yes \
-  --package=github:chrisjameslennon/create-voyzu#main \
-  -- create-voyzu install my-voyzu
+npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu install my-voyzu
 ```
 
 The shorter form is also supported:
 
 ```shell
-npm exec --yes \
-  --package=github:chrisjameslennon/create-voyzu#main \
-  -- create-voyzu my-voyzu
+npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu my-voyzu
 ```
 
 This creates:
@@ -28,7 +24,8 @@ my-voyzu/
 │  ├─ voyzu/
 │  └─ voyzu-modules/
 ├─ scripts/
-│  └─ update-voyzu.mjs
+│  ├─ update-voyzu.mjs
+│  └─ re-install-voyzu.mjs
 ├─ package.json
 └─ README.md
 ```
@@ -57,6 +54,9 @@ The updater pulls both shallow checkouts with `--ff-only`, recopies Voyzu
 Modules into Voyzu, and reinstalls platform dependencies. Ignored, untracked
 configuration such as `.env.local` remains in place during an in-place pull.
 
+To discard and recreate a live runtime, run `npm run re-install`. This removes
+`.run` and then uses the updater to clone both repositories again.
+
 ## Voyzu Modules development
 
 Add these scripts to the root `package.json` in `voyzu-modules`:
@@ -65,6 +65,7 @@ Add these scripts to the root `package.json` in `voyzu-modules`:
 {
   "scripts": {
     "create-dev": "npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev",
+    "re-install": "npm run create-dev -- --force",
     "dev": "npm --prefix .dev run dev",
     "build": "npm --prefix .dev run build"
   }

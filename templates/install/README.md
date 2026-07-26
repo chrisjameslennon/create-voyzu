@@ -19,3 +19,12 @@ npm start
 
 The updater pulls the shallow Voyzu and Voyzu Modules checkouts, refreshes the
 module copy inside Voyzu, and installs the current platform dependencies.
+
+To discard and recreate the complete runtime:
+
+```shell
+npm run re-install
+```
+
+This removes `.run`, then uses the updater to clone both repositories again,
+refresh the module copy, and reinstall dependencies.

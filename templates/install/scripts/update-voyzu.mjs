@@ -68,12 +68,41 @@ function assertInside(parent, child) {
 }
 
 async function pullRepository(directory, label) {
-  if (!(await pathExists(join(directory, ".git")))) {
-    throw new Error(`${label} is not a Git checkout: ${directory}`);
-  }
-
   console.log(`Updating ${label}...`);
   await run("git", ["pull", "--ff-only"], { cwd: directory });
+}
+
+async function updateRepository({
+  directory,
+  label,
+  repository,
+  ref,
+}) {
+  if (await pathExists(join(directory, ".git"))) {
+    await pullRepository(directory, label);
+    return;
+  }
+
+  if (await pathExists(directory)) {
+    throw new Error(
+      `${label} directory exists but is not a Git checkout: ${directory}`,
+    );
+  }
+
+  if (!repository) {
+    throw new Error(`No repository is configured for ${label}.`);
+  }
+
+  console.log(`Downloading ${label}...`);
+  await mkdir(dirname(directory), { recursive: true });
+
+  const cloneArguments = ["clone", "--depth", "1"];
+  if (ref && ref !== "repository default") {
+    cloneArguments.push("--branch", ref);
+  }
+  cloneArguments.push(repository, directory);
+
+  await run("git", cloneArguments);
 }
 
 async function installPlatformDependencies(platformDirectory) {
@@ -123,8 +152,18 @@ assertInside(installationRoot, platformDirectory);
 assertInside(installationRoot, modulesDirectory);
 assertInside(platformDirectory, modulesTarget);
 
-await pullRepository(platformDirectory, "Voyzu");
-await pullRepository(modulesDirectory, "Voyzu Modules");
+await updateRepository({
+  directory: platformDirectory,
+  label: "Voyzu",
+  repository: installationPackage.voyzu.platform.repository,
+  ref: installationPackage.voyzu.platform.ref,
+});
+await updateRepository({
+  directory: modulesDirectory,
+  label: "Voyzu Modules",
+  repository: installationPackage.voyzu.modules.repository,
+  ref: installationPackage.voyzu.modules.ref,
+});
 
 console.log("Refreshing Voyzu Modules inside Voyzu...");
 await rm(modulesTarget, { recursive: true, force: true });

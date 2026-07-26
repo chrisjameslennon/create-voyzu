@@ -118,6 +118,11 @@ try {
   ))) {
     throw new Error("Virgin installation did not create its update script.");
   }
+  if (!(await pathExists(
+    join(generatedProject, "scripts/re-install-voyzu.mjs"),
+  ))) {
+    throw new Error("Virgin installation did not create its re-install script.");
+  }
   if (await pathExists(join(generatedProject, ".gitignore"))) {
     throw new Error("Virgin installation created an unnecessary .gitignore.");
   }
@@ -131,6 +136,8 @@ try {
       !== "npm --prefix .run/voyzu run start"
     || generatedPackageJson.scripts.update
       !== "node ./scripts/update-voyzu.mjs"
+    || generatedPackageJson.scripts["re-install"]
+      !== "node ./scripts/re-install-voyzu.mjs"
   ) {
     throw new Error("Virgin package.json was not rendered from the install template.");
   }
