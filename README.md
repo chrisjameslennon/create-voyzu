@@ -39,7 +39,6 @@ The `.run` directory is intentionally **not** ignored. It is the source used by 
 
 ```shell
 cd my-voyzu
-npm run dev
 npm run build
 npm run start
 ```
@@ -52,8 +51,8 @@ Add these scripts to the root `package.json` in `voyzu-modules`:
 {
   "scripts": {
     "create-dev": "npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev",
-    "dev": "node .dev/run-voyzu.mjs dev",
-    "build": "node .dev/run-voyzu.mjs build"
+    "dev": "npm --prefix .dev/voyzu run dev",
+    "build": "npm --prefix .dev/voyzu run build"
   }
 }
 ```
@@ -70,21 +69,23 @@ This creates:
 ```text
 voyzu-modules/
 ├─ .dev/
-│  ├─ voyzu/
-│  └─ run-voyzu.mjs
+│  └─ voyzu/
 └─ packages/
+   └─ @voyzu-modules/
 ```
 
 The development setup:
 
-1. Adds `.dev/` to the current repository's `.gitignore` when necessary.
+1. Adds `/.dev/` to the current repository's `.gitignore` when necessary.
 2. Shallow-clones Voyzu into `.dev/voyzu`.
 3. Removes `.dev/voyzu/.git`.
-4. Runs `npm install` inside `.dev/voyzu`.
-5. Runs the Next.js application from `.dev/voyzu`.
-6. Supplies the current `voyzu-modules` repository through the `VOYZU_MODULES_DIR` environment variable.
+4. Links `.dev/voyzu/packages/@voyzu-modules` directly to the current
+   `packages/@voyzu-modules` directory.
+5. Runs `npm install` inside `.dev/voyzu`.
+6. Runs the Next.js application from `.dev/voyzu`.
 
-The downloaded Voyzu source is not rewritten or rearranged. Only normal ignored runtime output such as `node_modules` and `.next` is created inside it.
+The downloaded Voyzu source is not rewritten or rearranged. The only source-tree
+addition is the filesystem link that recreates the combined package layout.
 
 To recreate the runtime:
 
@@ -92,27 +93,23 @@ To recreate the runtime:
 npm run create-dev -- --force
 ```
 
-## Runtime contract
+## Combined filesystem layout
 
-Voyzu must discover the external module source from:
-
-```text
-VOYZU_MODULES_DIR
-```
-
-For a virgin installation this points to:
+Voyzu Platform and Voyzu Modules retain their existing package and import
+structure. The installer recreates that structure with a directory link:
 
 ```text
-.run/voyzu-modules
+<voyzu-runtime>/packages/@voyzu-modules
+    -> <voyzu-modules>/packages/@voyzu-modules
 ```
 
-For module development this points to the current `voyzu-modules` repository.
-
-This keeps the platform source unchanged in both modes and allows the virgin and development setup paths to use the same runtime model.
+On Windows this is a directory junction. On macOS and Linux it is a symbolic
+link. No environment-based module loader or discovery mechanism is used.
 
 ## Git refs
 
-The default branch is `main`. A branch or tag can be selected explicitly:
+With no explicit ref, each Git repository's default branch is used. A branch or
+tag can be selected explicitly:
 
 ```shell
 create-voyzu install my-voyzu --ref v0.1.0 --modules-ref v0.1.0

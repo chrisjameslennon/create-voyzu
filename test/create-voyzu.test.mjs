@@ -1,5 +1,13 @@
 import { spawn } from "node:child_process";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  lstat,
+  mkdtemp,
+  mkdir,
+  readFile,
+  realpath,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import process from "node:process";
@@ -53,9 +61,9 @@ try {
         name: "test-voyzu",
         private: true,
         scripts: {
-          dev: 'node -e "console.log(process.env.VOYZU_MODULES_DIR)"',
-          build: 'node -e "console.log(process.env.VOYZU_MODULES_DIR)"',
-          start: 'node -e "console.log(process.env.VOYZU_MODULES_DIR)"',
+          dev: 'node -e "console.log(\'dev\')"',
+          build: 'node -e "console.log(\'build\')"',
+          start: 'node -e "console.log(\'start\')"',
         },
       },
       null,
@@ -65,11 +73,18 @@ try {
 
   await createRepository(modulesRepository, {
     "package.json": JSON.stringify(
-      { name: "test-voyzu-modules", private: true },
+      { name: "voyzu-modules", private: true },
       null,
       2,
     ),
-    "packages/@voyzu/modules/example/README.md": "# Example\n",
+    "packages/@voyzu-modules/all-modules/package.json": JSON.stringify({
+      name: "@voyzu-modules/all-modules",
+      private: true,
+    }),
+    "packages/@voyzu-modules/types/package.json": JSON.stringify({
+      name: "@voyzu-modules/types",
+      private: true,
+    }),
   });
 
   const environment = {
@@ -83,15 +98,40 @@ try {
     [cliPath, "install", generatedProject, "--skip-install"],
     { env: environment },
   );
-  await run("npm", ["run", "dev"], { cwd: generatedProject });
+  await run("npm", ["run", "build"], { cwd: generatedProject });
+
+  const installedLink = join(
+    generatedProject,
+    ".run/voyzu/packages/@voyzu-modules",
+  );
+  if (!(await lstat(installedLink)).isSymbolicLink()) {
+    throw new Error("Virgin installation did not create the modules link.");
+  }
+  const installedModules = join(
+    generatedProject,
+    ".run/voyzu-modules/packages/@voyzu-modules",
+  );
+  if ((await realpath(installedLink)) !== (await realpath(installedModules))) {
+    throw new Error("Virgin installation modules link has the wrong target.");
+  }
 
   await run(process.execPath, [cliPath, "dev", "--skip-install"], {
     cwd: modulesRepository,
     env: environment,
   });
-  await run(process.execPath, [join(modulesRepository, ".dev/run-voyzu.mjs"), "dev"], {
-    cwd: modulesRepository,
+  await run("npm", ["run", "dev"], {
+    cwd: join(modulesRepository, ".dev/voyzu"),
   });
+
+  const developmentLink = join(
+    modulesRepository,
+    ".dev/voyzu/packages/@voyzu-modules",
+  );
+  if ((await realpath(developmentLink)) !== (
+    await realpath(join(modulesRepository, "packages/@voyzu-modules"))
+  )) {
+    throw new Error("Development modules link has the wrong target.");
+  }
 
   const gitignore = await readFile(join(modulesRepository, ".gitignore"), "utf8");
   if (!gitignore.includes(".dev/")) {

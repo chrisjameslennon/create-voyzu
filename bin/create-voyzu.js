@@ -8,9 +8,10 @@ import {
   readFile,
   readdir,
   rm,
+  symlink,
   writeFile,
 } from "node:fs/promises";
-import { basename, join, relative, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import process from "node:process";
 
 const DEFAULT_VOYZU_REPOSITORY =
@@ -19,8 +20,8 @@ const DEFAULT_VOYZU_REPOSITORY =
 const DEFAULT_MODULES_REPOSITORY =
   process.env.VOYZU_MODULES_REPOSITORY ||
   "https://github.com/chrisjameslennon/voyzu-modules.git";
-const DEFAULT_VOYZU_REF = process.env.VOYZU_REF || "main";
-const DEFAULT_MODULES_REF = process.env.VOYZU_MODULES_REF || "main";
+const DEFAULT_VOYZU_REF = process.env.VOYZU_REF;
+const DEFAULT_MODULES_REF = process.env.VOYZU_MODULES_REF;
 
 function run(command, args, options = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -127,17 +128,22 @@ function parseArguments(argv) {
 }
 
 async function cloneDetachedCopy({ repository, ref, targetDirectory, label }) {
-  console.log(`Downloading ${label} from GitHub (${ref})...`);
+  console.log(
+    `Downloading ${label} from GitHub (${ref || "repository default branch"})...`,
+  );
 
-  await run("git", [
+  const cloneArguments = [
     "clone",
     "--depth",
     "1",
-    "--branch",
-    ref,
-    repository,
-    targetDirectory,
-  ]);
+  ];
+
+  if (ref) {
+    cloneArguments.push("--branch", ref);
+  }
+
+  cloneArguments.push(repository, targetDirectory);
+  await run("git", cloneArguments);
 
   // The generated runtime is source copied from GitHub, not a nested checkout.
   await rm(join(targetDirectory, ".git"), {
@@ -146,7 +152,26 @@ async function cloneDetachedCopy({ repository, ref, targetDirectory, label }) {
   });
 }
 
-function runtimeRunnerSource({ platformDirectory, modulesDirectory }) {
+async function linkModulesIntoVoyzu(platformDirectory, modulesDirectory) {
+  const source = join(modulesDirectory, "packages", "@voyzu-modules");
+  const target = join(platformDirectory, "packages", "@voyzu-modules");
+
+  if (!(await pathExists(source))) {
+    throw new Error(
+      `Voyzu Modules package directory was not found: ${source}`,
+    );
+  }
+
+  await rm(target, { recursive: true, force: true });
+  await mkdir(dirname(target), { recursive: true });
+  await symlink(
+    source,
+    target,
+    process.platform === "win32" ? "junction" : "dir",
+  );
+}
+
+function runtimeRunnerSource(platformDirectory) {
   return `#!/usr/bin/env node
 
 import { spawn } from "node:child_process";
@@ -161,19 +186,13 @@ if (!command) {
   process.exit(1);
 }
 
-const platformDirectory = resolve(${JSON.stringify(platformDirectory)});
-const modulesDirectory = resolve(${JSON.stringify(modulesDirectory)});
-
 const child = spawn(
   process.platform === "win32" ? "npm.cmd" : "npm",
   ["run", command, ...(forwardedArguments.length ? ["--", ...forwardedArguments] : [])],
   {
-    cwd: platformDirectory,
+    cwd: resolve(${JSON.stringify(platformDirectory)}),
     stdio: "inherit",
-    env: {
-      ...process.env,
-      VOYZU_MODULES_DIR: modulesDirectory,
-    },
+    env: process.env,
   },
 );
 
@@ -261,18 +280,17 @@ async function createVirginInstall(options) {
       label: "Voyzu Modules",
     });
 
+    console.log("Linking Voyzu Modules into Voyzu...");
+    await linkModulesIntoVoyzu(platformDirectory, modulesDirectory);
+
     if (!options.skipInstall) {
       await installDependencies(platformDirectory, "Voyzu");
-      await installDependencies(modulesDirectory, "Voyzu Modules");
     }
 
     await mkdir(scriptsDirectory, { recursive: true });
     await writeFile(
       join(scriptsDirectory, "run-voyzu.mjs"),
-      runtimeRunnerSource({
-        platformDirectory: ".run/voyzu",
-        modulesDirectory: ".run/voyzu-modules",
-      }),
+      runtimeRunnerSource(".run/voyzu"),
       "utf8",
     );
 
@@ -281,7 +299,6 @@ async function createVirginInstall(options) {
       private: true,
       version: "0.1.0",
       scripts: {
-        dev: "node ./scripts/run-voyzu.mjs dev",
         build: "node ./scripts/run-voyzu.mjs build",
         start: "node ./scripts/run-voyzu.mjs start",
       },
@@ -313,7 +330,7 @@ async function createVirginInstall(options) {
 
     await writeFile(
       join(targetDirectory, "README.md"),
-      `# ${projectName}\n\nGenerated Voyzu installation.\n\n\`\`\`shell\nnpm run dev\nnpm run build\nnpm run start\n\`\`\`\n`,
+      `# ${projectName}\n\nGenerated Voyzu installation.\n\n\`\`\`shell\nnpm run build\nnpm run start\n\`\`\`\n`,
       "utf8",
     );
 
@@ -324,7 +341,8 @@ async function createVirginInstall(options) {
     console.log("Voyzu created successfully.");
     console.log("");
     console.log(`  cd ${options.target}`);
-    console.log("  npm run dev");
+    console.log("  npm run build");
+    console.log("  npm run start");
   } catch (error) {
     await rm(targetDirectory, { recursive: true, force: true });
     throw error;
@@ -335,11 +353,25 @@ async function createDevelopmentRuntime(options) {
   const modulesRoot = resolve(options.target || process.cwd());
   const developmentDirectory = join(modulesRoot, ".dev");
   const platformDirectory = join(developmentDirectory, "voyzu");
-  const runnerPath = join(developmentDirectory, "run-voyzu.mjs");
 
   if (!(await pathExists(join(modulesRoot, "package.json")))) {
     throw new Error(
       `No package.json found in the Voyzu Modules directory: ${modulesRoot}`,
+    );
+  }
+
+  const modulesPackageJson = JSON.parse(
+    await readFile(join(modulesRoot, "package.json"), "utf8"),
+  );
+  if (modulesPackageJson.name !== "voyzu-modules") {
+    throw new Error(
+      `create-voyzu dev must run from the voyzu-modules repository root: ${modulesRoot}`,
+    );
+  }
+
+  if (!(await pathExists(join(modulesRoot, "packages", "@voyzu-modules")))) {
+    throw new Error(
+      `No packages/@voyzu-modules directory found in: ${modulesRoot}`,
     );
   }
 
@@ -364,25 +396,18 @@ async function createDevelopmentRuntime(options) {
       label: "Voyzu",
     });
 
+    console.log("Linking the current Voyzu Modules source into Voyzu...");
+    await linkModulesIntoVoyzu(platformDirectory, modulesRoot);
+
     if (!options.skipInstall) {
       await installDependencies(platformDirectory, "Voyzu");
     }
 
-    const relativePlatformDirectory = relative(modulesRoot, platformDirectory);
-    await writeFile(
-      runnerPath,
-      runtimeRunnerSource({
-        platformDirectory: relativePlatformDirectory,
-        modulesDirectory: ".",
-      }),
-      "utf8",
-    );
-
     console.log("");
     console.log("Voyzu development runtime created successfully.");
     console.log("");
-    console.log("The downloaded Voyzu source is unchanged and has no Git remote.");
-    console.log("The runtime receives the current repository through VOYZU_MODULES_DIR.");
+    console.log("The downloaded Voyzu source has no nested Git repository.");
+    console.log("Voyzu Modules is linked directly from the current repository.");
     console.log("");
     console.log("Run:");
     console.log("  npm run dev");
@@ -403,8 +428,8 @@ Commands:
   create-voyzu dev [modules-dir]    Create .dev/voyzu for module development
 
 Options:
-  --ref <branch-or-tag>             Voyzu Git ref (default: ${DEFAULT_VOYZU_REF})
-  --modules-ref <branch-or-tag>     Voyzu Modules Git ref (default: ${DEFAULT_MODULES_REF})
+  --ref <branch-or-tag>             Voyzu Git ref (default: repository default)
+  --modules-ref <branch-or-tag>     Voyzu Modules Git ref (default: repository default)
   --force                           Recreate an existing .dev directory
   --skip-install                    Do not run npm install
 
