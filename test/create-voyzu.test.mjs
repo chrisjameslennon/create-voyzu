@@ -113,8 +113,10 @@ try {
   );
   await run("npm", ["run", "build"], { cwd: generatedProject });
 
-  if (await pathExists(join(generatedProject, "scripts"))) {
-    throw new Error("Virgin installation created an unnecessary scripts directory.");
+  if (!(await pathExists(
+    join(generatedProject, "scripts/update-voyzu.mjs"),
+  ))) {
+    throw new Error("Virgin installation did not create its update script.");
   }
   if (await pathExists(join(generatedProject, ".gitignore"))) {
     throw new Error("Virgin installation created an unnecessary .gitignore.");
@@ -127,8 +129,18 @@ try {
       !== "npm --prefix .run/voyzu run build"
     || generatedPackageJson.scripts.start
       !== "npm --prefix .run/voyzu run start"
+    || generatedPackageJson.scripts.update
+      !== "node ./scripts/update-voyzu.mjs"
   ) {
     throw new Error("Virgin package.json was not rendered from the install template.");
+  }
+  if (
+    !(await pathExists(join(generatedProject, ".run/voyzu/.git")))
+    || !(await pathExists(
+      join(generatedProject, ".run/voyzu-modules/.git"),
+    ))
+  ) {
+    throw new Error("Virgin installation did not retain shallow Git metadata.");
   }
 
   const installedModules = join(
@@ -163,6 +175,10 @@ try {
   await run("npm", ["run", "dev"], {
     cwd: join(modulesRepository, ".dev"),
   });
+
+  if (await pathExists(join(modulesRepository, ".dev/voyzu/.git"))) {
+    throw new Error("Development installation retained nested Git metadata.");
+  }
 
   const developmentLink = join(
     modulesRepository,

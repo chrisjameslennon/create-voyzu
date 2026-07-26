@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npm --prefix .run/voyzu run build",
     "prestart": "npm run build",
-    "start": "npm --prefix .run/voyzu run start"
+    "start": "npm --prefix .run/voyzu run start",
+    "update": "node ./scripts/update-voyzu.mjs"
   },
   "voyzu": {
     "platform": {

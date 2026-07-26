@@ -130,7 +130,12 @@ function parseArguments(argv) {
   return options;
 }
 
-async function cloneDetachedCopy({ repository, ref, targetDirectory, label }) {
+async function cloneShallowRepository({
+  repository,
+  ref,
+  targetDirectory,
+  label,
+}) {
   console.log(
     `Downloading ${label} from GitHub (${ref || "repository default branch"})...`,
   );
@@ -147,9 +152,15 @@ async function cloneDetachedCopy({ repository, ref, targetDirectory, label }) {
 
   cloneArguments.push(repository, targetDirectory);
   await run("git", cloneArguments);
+}
 
-  // The generated runtime is source copied from GitHub, not a nested checkout.
-  await rm(join(targetDirectory, ".git"), {
+async function cloneLiveRepository(options) {
+  await cloneShallowRepository(options);
+}
+
+async function cloneDevelopmentRepository(options) {
+  await cloneShallowRepository(options);
+  await rm(join(options.targetDirectory, ".git"), {
     recursive: true,
     force: true,
   });
@@ -247,19 +258,20 @@ async function createVirginInstall(options) {
   const runtimeDirectory = join(targetDirectory, ".run");
   const platformDirectory = join(runtimeDirectory, "voyzu");
   const modulesDirectory = join(runtimeDirectory, "voyzu-modules");
+  const scriptsDirectory = join(targetDirectory, "scripts");
 
   try {
     console.log(`Creating ${projectName}...`);
     await mkdir(runtimeDirectory, { recursive: true });
 
-    await cloneDetachedCopy({
+    await cloneLiveRepository({
       repository: DEFAULT_VOYZU_REPOSITORY,
       ref: options.voyzuRef,
       targetDirectory: platformDirectory,
       label: "Voyzu",
     });
 
-    await cloneDetachedCopy({
+    await cloneLiveRepository({
       repository: DEFAULT_MODULES_REPOSITORY,
       ref: options.modulesRef,
       targetDirectory: modulesDirectory,
@@ -299,6 +311,12 @@ async function createVirginInstall(options) {
         PROJECT_NAME: projectName,
       }),
       "utf8",
+    );
+
+    await cp(
+      join(TEMPLATES_ROOT, "install", "scripts"),
+      scriptsDirectory,
+      { recursive: true },
     );
 
     console.log("Initialising the generated project Git repository...");
@@ -354,7 +372,7 @@ async function createDevelopmentRuntime(options) {
   try {
     await mkdir(developmentDirectory, { recursive: true });
 
-    await cloneDetachedCopy({
+    await cloneDevelopmentRepository({
       repository: DEFAULT_VOYZU_REPOSITORY,
       ref: options.voyzuRef,
       targetDirectory: platformDirectory,

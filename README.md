@@ -27,11 +27,15 @@ my-voyzu/
 ├─ .run/
 │  ├─ voyzu/
 │  └─ voyzu-modules/
+├─ scripts/
+│  └─ update-voyzu.mjs
 ├─ package.json
 └─ README.md
 ```
 
-Both GitHub repositories are shallow-cloned and their nested `.git` directories are removed. The generated project is then initialised as its own Git repository with no remote.
+Both GitHub repositories are shallow-cloned and retain their `.git` directories
+so live installations can pull updates. The generated project is also
+initialised as its own Git repository with no remote.
 
 The `.run` directory is intentionally **not** ignored. It is the source used by development and production builds.
 
@@ -41,6 +45,17 @@ npm start
 ```
 
 The start command builds Voyzu before launching the production server.
+
+Update a stopped live installation with:
+
+```shell
+npm run update
+npm start
+```
+
+The updater pulls both shallow checkouts with `--ff-only`, recopies Voyzu
+Modules into Voyzu, and reinstalls platform dependencies. Ignored, untracked
+configuration such as `.env.local` remains in place during an in-place pull.
 
 ## Voyzu Modules development
 
