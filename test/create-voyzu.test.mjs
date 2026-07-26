@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import {
+  access,
   lstat,
   mkdtemp,
   mkdir,
@@ -11,6 +12,18 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import process from "node:process";
+
+async function pathExists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return false;
+    }
+    throw error;
+  }
+}
 
 function run(command, args, options = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -100,6 +113,24 @@ try {
   );
   await run("npm", ["run", "build"], { cwd: generatedProject });
 
+  if (await pathExists(join(generatedProject, "scripts"))) {
+    throw new Error("Virgin installation created an unnecessary scripts directory.");
+  }
+  if (await pathExists(join(generatedProject, ".gitignore"))) {
+    throw new Error("Virgin installation created an unnecessary .gitignore.");
+  }
+  const generatedPackageJson = JSON.parse(
+    await readFile(join(generatedProject, "package.json"), "utf8"),
+  );
+  if (
+    generatedPackageJson.scripts.build
+      !== "npm --prefix .run/voyzu run build"
+    || generatedPackageJson.scripts.start
+      !== "npm --prefix .run/voyzu run start"
+  ) {
+    throw new Error("Virgin package.json was not rendered from the install template.");
+  }
+
   const installedModules = join(
     generatedProject,
     ".run/voyzu/packages/@voyzu-modules",
@@ -130,7 +161,7 @@ try {
     env: environment,
   });
   await run("npm", ["run", "dev"], {
-    cwd: join(modulesRepository, ".dev/voyzu"),
+    cwd: join(modulesRepository, ".dev"),
   });
 
   const developmentLink = join(
@@ -143,9 +174,20 @@ try {
     throw new Error("Development modules link has the wrong target.");
   }
 
-  const gitignore = await readFile(join(modulesRepository, ".gitignore"), "utf8");
-  if (!gitignore.includes(".dev/")) {
-    throw new Error("Development setup did not add .dev/ to .gitignore.");
+  if (await pathExists(join(modulesRepository, ".gitignore"))) {
+    throw new Error("Development setup created an unnecessary .gitignore.");
+  }
+  const developmentPackageJson = JSON.parse(
+    await readFile(join(modulesRepository, ".dev/package.json"), "utf8"),
+  );
+  if (developmentPackageJson.scripts.dev !== "npm --prefix voyzu run dev") {
+    throw new Error("Development package.json was not rendered from its template.");
+  }
+  if (!(await readFile(
+    join(modulesRepository, ".dev/README.md"),
+    "utf8",
+  )).includes("Voyzu Modules Development Runtime")) {
+    throw new Error("Development README was not rendered from its template.");
   }
 
   console.log("create-voyzu tests passed.");

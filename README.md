@@ -27,8 +27,6 @@ my-voyzu/
 ├─ .run/
 │  ├─ voyzu/
 │  └─ voyzu-modules/
-├─ scripts/
-│  └─ run-voyzu.mjs
 ├─ package.json
 └─ README.md
 ```
@@ -39,9 +37,10 @@ The `.run` directory is intentionally **not** ignored. It is the source used by 
 
 ```shell
 cd my-voyzu
-npm run build
-npm run start
+npm start
 ```
+
+The start command builds Voyzu before launching the production server.
 
 ## Voyzu Modules development
 
@@ -51,8 +50,8 @@ Add these scripts to the root `package.json` in `voyzu-modules`:
 {
   "scripts": {
     "create-dev": "npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev",
-    "dev": "npm --prefix .dev/voyzu run dev",
-    "build": "npm --prefix .dev/voyzu run build"
+    "dev": "npm --prefix .dev run dev",
+    "build": "npm --prefix .dev run build"
   }
 }
 ```
@@ -69,20 +68,23 @@ This creates:
 ```text
 voyzu-modules/
 ├─ .dev/
-│  └─ voyzu/
+│  ├─ voyzu/
+│  ├─ package.json
+│  └─ README.md
 └─ packages/
    └─ @voyzu-modules/
 ```
 
 The development setup:
 
-1. Adds `/.dev/` to the current repository's `.gitignore` when necessary.
-2. Shallow-clones Voyzu into `.dev/voyzu`.
-3. Removes `.dev/voyzu/.git`.
-4. Links `.dev/voyzu/packages/@voyzu-modules` directly to the current
+1. Shallow-clones Voyzu into `.dev/voyzu`.
+2. Removes `.dev/voyzu/.git`.
+3. Links `.dev/voyzu/packages/@voyzu-modules` directly to the current
    `packages/@voyzu-modules` directory.
+4. Generates `.dev/package.json` and `.dev/README.md` from development
+   templates.
 5. Runs `npm install` inside `.dev/voyzu`.
-6. Runs the Next.js application from `.dev/voyzu`.
+6. Runs the Next.js application through `.dev/package.json`.
 
 The downloaded Voyzu source is not rewritten or rearranged. The only source-tree
 addition is the filesystem link that recreates the combined package layout.

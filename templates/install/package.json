@@ -1,0 +1,22 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "build": "npm --prefix .run/voyzu run build",
+    "prestart": "npm run build",
+    "start": "npm --prefix .run/voyzu run start"
+  },
+  "voyzu": {
+    "platform": {
+      "repository": "{{VOYZU_REPOSITORY}}",
+      "ref": "{{VOYZU_REF}}",
+      "directory": ".run/voyzu"
+    },
+    "modules": {
+      "repository": "{{VOYZU_MODULES_REPOSITORY}}",
+      "ref": "{{VOYZU_MODULES_REF}}",
+      "directory": ".run/voyzu-modules"
+    }
+  }
+}
