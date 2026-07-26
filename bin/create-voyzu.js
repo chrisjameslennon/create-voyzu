@@ -209,6 +209,7 @@ const child = spawn(
     cwd: resolve(${JSON.stringify(platformDirectory)}),
     stdio: "inherit",
     env: process.env,
+    shell: process.platform === "win32",
   },
 );
 
