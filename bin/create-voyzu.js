@@ -221,6 +221,11 @@ async function installDependencies(directory, label) {
   await run("npm", ["install", "--package-lock=false"], { cwd: directory });
 }
 
+async function installDevelopmentWorkspaceDependencies(directory) {
+  console.log("Linking Voyzu platform dependencies into the package working tree...");
+  await run("npm", ["install", "--package-lock=false"], { cwd: directory });
+}
+
 async function writeFileIfMissing(path, contents) {
   if (await pathExists(path)) {
     console.log(`Preserving existing ${basename(path)}.`);
@@ -426,6 +431,7 @@ async function createDevelopmentRuntime(options) {
 
     if (!options.skipInstall) {
       await installDependencies(developmentDirectory, "Voyzu development runtime");
+      await installDevelopmentWorkspaceDependencies(packagesRoot);
     }
 
     console.log("");
