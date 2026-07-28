@@ -441,7 +441,7 @@ async function createDevelopmentRuntime(options) {
     console.log("Installed development packages will link directly to this repository.");
     console.log("");
     console.log("Run:");
-    console.log("  npm run voyzu -- install @voyzu-packages/ice-creams");
+    console.log("  npm run voyzu -- install @voyzu-packages/ice-creams --link");
     console.log("  npm run dev");
   } catch (error) {
     await rm(developmentDirectory, { recursive: true, force: true });

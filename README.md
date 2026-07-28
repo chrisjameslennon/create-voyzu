@@ -89,7 +89,7 @@ repository:
 
 ```shell
 npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev
-npm run voyzu -- install @voyzu-packages/ice-creams
+npm run voyzu -- install @voyzu-packages/ice-creams --link
 npm run dev
 ```
 
