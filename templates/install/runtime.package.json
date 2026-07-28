@@ -16,6 +16,7 @@
     "typecheck": "npm --prefix voyzu run typecheck"
   },
   "voyzu": {
+    "mode": "production",
     "composedPackages": []
   }
 }

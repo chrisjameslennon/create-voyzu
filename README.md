@@ -84,11 +84,18 @@ temporary compatibility aliases.
 
 ## Package development runtime
 
-The existing special development bootstrap remains available:
+Run the development bootstrap from the root of a `voyzu-packages` working
+repository:
 
 ```shell
-create-voyzu dev
+npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev
+npm run voyzu -- install @voyzu-packages/ice-creams
+npm run dev
 ```
+
+Voyzu is downloaded into `.dev/voyzu`. Installed packages are linked from the
+working repository into `.dev/voyzu-packages`, so package source edits are
+available to the Next.js development server immediately.
 
 ## Requirements
 

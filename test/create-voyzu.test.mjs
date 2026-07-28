@@ -125,6 +125,7 @@ try {
   );
   if (
     !runtimePackage.workspaces.includes("voyzu-packages/@*/*")
+    || runtimePackage.voyzu.mode !== "production"
     || runtimePackage.voyzu.composedPackages.length !== 0
   ) {
     throw new Error("Runtime package.json is not the expected empty workspace.");
@@ -133,6 +134,45 @@ try {
   const localEnv = await readFile(join(generatedProject, ".env.local"), "utf8");
   if (!localEnv.includes("CHANGE_ME") || /password@/.test(localEnv)) {
     throw new Error(".env.local does not use safe placeholder values.");
+  }
+
+  await run(
+    process.execPath,
+    [cliPath, "dev", packagesRepository, "--skip-install"],
+    {
+      env: {
+        ...process.env,
+        VOYZU_REPOSITORY: platformRepository,
+      },
+    },
+  );
+
+  const expectedDevelopmentPaths = [
+    ".dev/package.json",
+    ".dev/voyzu/package.json",
+    ".dev/voyzu-packages",
+    ".env.development",
+    ".env.local",
+    "voyzu.instance.config.ts",
+  ];
+  for (const path of expectedDevelopmentPaths) {
+    if (!(await pathExists(join(packagesRepository, path)))) {
+      throw new Error(`Development installation did not create ${path}.`);
+    }
+  }
+  if (await pathExists(join(packagesRepository, ".dev/voyzu/.git"))) {
+    throw new Error("Development installation retained the nested Voyzu Git repository.");
+  }
+
+  const developmentPackage = JSON.parse(
+    await readFile(join(packagesRepository, ".dev/package.json"), "utf8"),
+  );
+  if (
+    developmentPackage.voyzu.mode !== "development"
+    || developmentPackage.voyzu.packageSource.directory !== ".."
+    || !developmentPackage.workspaces.includes("voyzu-packages/@*/*")
+  ) {
+    throw new Error("Development runtime package.json is not configured for linked packages.");
   }
 
   console.log("create-voyzu tests passed.");
