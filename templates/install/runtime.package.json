@@ -1,0 +1,21 @@
+{
+  "name": "{{PROJECT_NAME}}-runtime",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "voyzu/apps/*",
+    "voyzu/packages/*",
+    "voyzu/packages/@voyzu/*",
+    "voyzu-packages/*",
+    "voyzu-packages/@*/*"
+  ],
+  "scripts": {
+    "dev": "npm --prefix voyzu run dev",
+    "build": "npm --prefix voyzu run build",
+    "start": "npm --prefix voyzu run start",
+    "typecheck": "npm --prefix voyzu run typecheck"
+  },
+  "voyzu": {
+    "composedPackages": []
+  }
+}

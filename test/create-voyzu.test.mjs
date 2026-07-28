@@ -1,11 +1,9 @@
 import { spawn } from "node:child_process";
 import {
   access,
-  lstat,
   mkdtemp,
   mkdir,
   readFile,
-  realpath,
   rm,
   writeFile,
 } from "node:fs/promises";
@@ -13,26 +11,13 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import process from "node:process";
 
-async function pathExists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch (error) {
-    if (error?.code === "ENOENT") {
-      return false;
-    }
-    throw error;
-  }
-}
-
 function run(command, args, options = {}) {
   return new Promise((resolvePromise, reject) => {
     const child = spawn(command, args, {
       stdio: "inherit",
-      shell: process.platform === "win32",
+      shell: false,
       ...options,
     });
-
     child.on("error", reject);
     child.on("exit", (code) => {
       if (code === 0) resolvePromise();
@@ -41,176 +26,113 @@ function run(command, args, options = {}) {
   });
 }
 
+async function pathExists(path) {
+  try {
+    await access(path);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
 async function createRepository(directory, files) {
   await mkdir(directory, { recursive: true });
-
   for (const [filename, contents] of Object.entries(files)) {
     const path = join(directory, filename);
     await mkdir(resolve(path, ".."), { recursive: true });
     await writeFile(path, contents, "utf8");
   }
-
   await run("git", ["init", "--initial-branch=main"], { cwd: directory });
-  await run("git", ["config", "user.email", "test@example.com"], {
-    cwd: directory,
-  });
+  await run("git", ["config", "user.email", "test@example.com"], { cwd: directory });
   await run("git", ["config", "user.name", "Test"], { cwd: directory });
   await run("git", ["add", "."], { cwd: directory });
-  await run("git", ["commit", "-m", "Initial test repository"], {
-    cwd: directory,
-  });
+  await run("git", ["commit", "-m", "Initial-test-repository"], { cwd: directory });
 }
 
 const temporaryRoot = await mkdtemp(join(tmpdir(), "create-voyzu-test-"));
 const platformRepository = join(temporaryRoot, "voyzu");
-const modulesRepository = join(temporaryRoot, "voyzu-modules");
+const packagesRepository = join(temporaryRoot, "voyzu-packages");
 const generatedProject = join(temporaryRoot, "generated");
 const cliPath = resolve("bin/create-voyzu.js");
 
 try {
   await createRepository(platformRepository, {
-    "package.json": JSON.stringify(
-      {
-        name: "test-voyzu",
-        private: true,
-        scripts: {
-          dev: 'node -e "console.log(\'dev\')"',
-          build: 'node -e "console.log(\'build\')"',
-          start: 'node -e "console.log(\'start\')"',
-        },
-      },
-      null,
-      2,
-    ),
-  });
-
-  await createRepository(modulesRepository, {
-    "package.json": JSON.stringify(
-      { name: "voyzu-modules", private: true },
-      null,
-      2,
-    ),
-    "packages/@voyzu-modules/all-modules/package.json": JSON.stringify({
-      name: "@voyzu-modules/all-modules",
+    "package.json": JSON.stringify({ name: "voyzu", private: true }),
+    "packages/@voyzu/cli/package.json": JSON.stringify({
+      name: "@voyzu/cli",
       private: true,
+      bin: { voyzu: "./bin/voyzu.mjs" },
     }),
-    "packages/@voyzu-modules/types/package.json": JSON.stringify({
-      name: "@voyzu-modules/types",
+    "packages/@voyzu/cli/bin/voyzu.mjs": "#!/usr/bin/env node\n",
+  });
+  await createRepository(packagesRepository, {
+    "package.json": JSON.stringify({ name: "voyzu-packages", private: true }),
+    "voyzu-packages/example/package.json": JSON.stringify({
+      name: "@voyzu-packages/example",
       private: true,
+      voyzu: { "voyzu-package": true, isActive: true },
     }),
   });
-
-  const environment = {
-    ...process.env,
-    VOYZU_REPOSITORY: platformRepository,
-    VOYZU_MODULES_REPOSITORY: modulesRepository,
-  };
 
   await run(
     process.execPath,
     [cliPath, "install", generatedProject, "--skip-install"],
-    { env: environment },
+    {
+      env: {
+        ...process.env,
+        VOYZU_REPOSITORY: platformRepository,
+        VOYZU_PACKAGES_REPOSITORY: packagesRepository,
+      },
+    },
   );
-  await run("npm", ["run", "build"], { cwd: generatedProject });
 
-  if (!(await pathExists(
-    join(generatedProject, "scripts/update-voyzu.mjs"),
-  ))) {
-    throw new Error("Virgin installation did not create its update script.");
+  const expectedPaths = [
+    ".run/package.json",
+    ".run/voyzu/.git",
+    ".run/voyzu-packages",
+    "voyzu-package-repos/voyzu-packages/.git",
+    ".env.development",
+    ".env.local",
+    "voyzu.instance.config.ts",
+    "package.json",
+    "README.md",
+  ];
+  for (const path of expectedPaths) {
+    if (!(await pathExists(join(generatedProject, path)))) {
+      throw new Error(`Virgin installation did not create ${path}.`);
+    }
   }
-  if (!(await pathExists(
-    join(generatedProject, "scripts/re-install-voyzu.mjs"),
-  ))) {
-    throw new Error("Virgin installation did not create its re-install script.");
+
+  if (await pathExists(
+    join(generatedProject, ".run/voyzu-packages/@voyzu-packages/example"),
+  )) {
+    throw new Error("Virgin installation pre-installed an external package.");
   }
-  if (await pathExists(join(generatedProject, ".gitignore"))) {
-    throw new Error("Virgin installation created an unnecessary .gitignore.");
-  }
-  const generatedPackageJson = JSON.parse(
+
+  const rootPackage = JSON.parse(
     await readFile(join(generatedProject, "package.json"), "utf8"),
   );
   if (
-    generatedPackageJson.scripts.build
-      !== "npm --prefix .run/voyzu run build"
-    || generatedPackageJson.scripts.start
-      !== "npm --prefix .run/voyzu run start"
-    || generatedPackageJson.scripts.update
-      !== "node ./scripts/update-voyzu.mjs"
-    || generatedPackageJson.scripts["re-install"]
-      !== "node ./scripts/re-install-voyzu.mjs"
+    rootPackage.scripts.dev !== "npm --prefix .run run dev"
+    || rootPackage.workspaces[0] !== ".run/voyzu/packages/@voyzu/cli"
   ) {
-    throw new Error("Virgin package.json was not rendered from the install template.");
+    throw new Error("Root package.json does not expose the project-local CLI/runtime.");
   }
+
+  const runtimePackage = JSON.parse(
+    await readFile(join(generatedProject, ".run/package.json"), "utf8"),
+  );
   if (
-    !(await pathExists(join(generatedProject, ".run/voyzu/.git")))
-    || !(await pathExists(
-      join(generatedProject, ".run/voyzu-modules/.git"),
-    ))
+    !runtimePackage.workspaces.includes("voyzu-packages/@*/*")
+    || runtimePackage.voyzu.composedPackages.length !== 0
   ) {
-    throw new Error("Virgin installation did not retain shallow Git metadata.");
+    throw new Error("Runtime package.json is not the expected empty workspace.");
   }
 
-  const installedModules = join(
-    generatedProject,
-    ".run/voyzu/packages/@voyzu-modules",
-  );
-  const installedModulesStat = await lstat(installedModules);
-  if (
-    !installedModulesStat.isDirectory()
-    || installedModulesStat.isSymbolicLink()
-  ) {
-    throw new Error("Virgin installation did not copy the modules directory.");
-  }
-  const clonedModules = join(
-    generatedProject,
-    ".run/voyzu-modules/packages/@voyzu-modules",
-  );
-  if ((await realpath(installedModules)) === (await realpath(clonedModules))) {
-    throw new Error("Virgin installation modules directory is still linked.");
-  }
-  if (!(await readFile(
-    join(installedModules, "all-modules/package.json"),
-    "utf8",
-  )).includes('"@voyzu-modules/all-modules"')) {
-    throw new Error("Virgin installation did not copy the module contents.");
-  }
-
-  await run(process.execPath, [cliPath, "dev", "--skip-install"], {
-    cwd: modulesRepository,
-    env: environment,
-  });
-  await run("npm", ["run", "dev"], {
-    cwd: join(modulesRepository, ".dev"),
-  });
-
-  if (await pathExists(join(modulesRepository, ".dev/voyzu/.git"))) {
-    throw new Error("Development installation retained nested Git metadata.");
-  }
-
-  const developmentLink = join(
-    modulesRepository,
-    ".dev/voyzu/packages/@voyzu-modules",
-  );
-  if ((await realpath(developmentLink)) !== (
-    await realpath(join(modulesRepository, "packages/@voyzu-modules"))
-  )) {
-    throw new Error("Development modules link has the wrong target.");
-  }
-
-  if (await pathExists(join(modulesRepository, ".gitignore"))) {
-    throw new Error("Development setup created an unnecessary .gitignore.");
-  }
-  const developmentPackageJson = JSON.parse(
-    await readFile(join(modulesRepository, ".dev/package.json"), "utf8"),
-  );
-  if (developmentPackageJson.scripts.dev !== "npm --prefix voyzu run dev") {
-    throw new Error("Development package.json was not rendered from its template.");
-  }
-  if (!(await readFile(
-    join(modulesRepository, ".dev/README.md"),
-    "utf8",
-  )).includes("Voyzu Modules Development Runtime")) {
-    throw new Error("Development README was not rendered from its template.");
+  const localEnv = await readFile(join(generatedProject, ".env.local"), "utf8");
+  if (!localEnv.includes("CHANGE_ME") || /password@/.test(localEnv)) {
+    throw new Error(".env.local does not use safe placeholder values.");
   }
 
   console.log("create-voyzu tests passed.");

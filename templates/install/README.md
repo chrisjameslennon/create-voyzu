@@ -1,30 +1,71 @@
 # {{PROJECT_NAME}}
 
-Generated Voyzu installation.
+This is a Git-backed Voyzu installation.
+
+## First run
+
+Set the PostgreSQL password and any local provider secrets in `.env.local`,
+then start the development server:
+
+```shell
+npm run dev
+```
+
+Production startup builds first:
 
 ```shell
 npm start
 ```
 
-The start command builds Voyzu before launching the production server.
+`.env.development`, `.env.local`, and `voyzu.instance.config.ts` belong to this
+installation. Voyzu commands never overwrite them.
 
-## Update
+## Package repositories
 
-Stop the running application, then run:
+The official package repository is cloned into:
 
-```shell
-npm run update
-npm start
+```text
+voyzu-package-repos/voyzu-packages
 ```
 
-The updater pulls the shallow Voyzu and Voyzu Modules checkouts, refreshes the
-module copy inside Voyzu, and installs the current platform dependencies.
-
-To discard and recreate the complete runtime:
+Clone another package repository:
 
 ```shell
-npm run re-install
+npm exec voyzu -- clone repo https://github.com/example/fred-packages.git
 ```
 
-This removes `.run`, then uses the updater to clone both repositories again,
-refresh the module copy, and reinstall dependencies.
+Update all cloned package repositories:
+
+```shell
+npm exec voyzu -- pull-repos
+```
+
+Update one repository:
+
+```shell
+npm exec voyzu -- pull repo voyzu-packages
+```
+
+## Packages
+
+Install a package by its npm name:
+
+```shell
+npm exec voyzu -- install @voyzu-packages/ice-creams
+```
+
+The command copies the package into `.run/voyzu-packages`, installs its npm
+dependencies, runs the ordered SQL declared by `voyzu.package.ts`, and
+recomposes the application.
+
+Refresh every currently installed package from its cloned source:
+
+```shell
+npm exec voyzu -- install
+```
+
+Run a package script:
+
+```shell
+npm exec voyzu -- run @voyzu-packages/ice-creams sampleData
+```

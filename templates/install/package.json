@@ -2,23 +2,14 @@
   "name": "{{PROJECT_NAME}}",
   "private": true,
   "version": "0.1.0",
+  "workspaces": [
+    ".run/voyzu/packages/@voyzu/cli"
+  ],
   "scripts": {
-    "build": "npm --prefix .run/voyzu run build",
+    "dev": "npm --prefix .run run dev",
+    "build": "npm --prefix .run run build",
     "prestart": "npm run build",
-    "start": "npm --prefix .run/voyzu run start",
-    "update": "node ./scripts/update-voyzu.mjs",
-    "re-install": "node ./scripts/re-install-voyzu.mjs"
-  },
-  "voyzu": {
-    "platform": {
-      "repository": "{{VOYZU_REPOSITORY}}",
-      "ref": "{{VOYZU_REF}}",
-      "directory": ".run/voyzu"
-    },
-    "modules": {
-      "repository": "{{VOYZU_MODULES_REPOSITORY}}",
-      "ref": "{{VOYZU_MODULES_REF}}",
-      "directory": ".run/voyzu-modules"
-    }
+    "start": "npm --prefix .run run start",
+    "typecheck": "npm --prefix .run run typecheck"
   }
 }
