@@ -66,8 +66,8 @@ try {
   });
   await createRepository(packagesRepository, {
     "package.json": JSON.stringify({ name: "voyzu-packages", private: true }),
-    "voyzu-packages/example/package.json": JSON.stringify({
-      name: "@voyzu-packages/example",
+    "packages/@voyzu/example/package.json": JSON.stringify({
+      name: "@voyzu/example",
       private: true,
       voyzu: { "voyzu-package": true, isActive: true },
     }),
@@ -88,7 +88,7 @@ try {
   const expectedPaths = [
     ".run/package.json",
     ".run/voyzu/.git",
-    ".run/voyzu-packages",
+    ".run/packages",
     "voyzu-package-repos/voyzu-packages/.git",
     ".env.local",
     "voyzu.instance.config.ts",
@@ -102,7 +102,7 @@ try {
   }
 
   if (await pathExists(
-    join(generatedProject, ".run/voyzu-packages/@voyzu-packages/example"),
+    join(generatedProject, ".run/packages/@voyzu/example"),
   )) {
     throw new Error("Virgin installation pre-installed an external package.");
   }
@@ -127,7 +127,7 @@ try {
     await readFile(join(generatedProject, ".run/package.json"), "utf8"),
   );
   if (
-    !runtimePackage.workspaces.includes("voyzu-packages/@*/*")
+    !runtimePackage.workspaces.includes("packages/@*/*")
     || runtimePackage.voyzu.mode !== "production"
     || runtimePackage.voyzu.composedPackages.length !== 0
   ) {
@@ -160,7 +160,7 @@ try {
   const expectedDevelopmentPaths = [
     ".run/package.json",
     ".run/voyzu/package.json",
-    ".run/voyzu-packages",
+    ".run/packages",
     ".env.local",
     "voyzu.instance.config.ts",
   ];
@@ -179,7 +179,7 @@ try {
   if (
     developmentPackage.voyzu.mode !== "development"
     || developmentPackage.voyzu.packageSource.directory !== ".."
-    || !developmentPackage.workspaces.includes("voyzu-packages/@*/*")
+    || !developmentPackage.workspaces.includes("packages/@*/*")
   ) {
     throw new Error("Development runtime package.json is not configured for linked packages.");
   }

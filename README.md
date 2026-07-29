@@ -22,7 +22,7 @@ The generated structure is:
 my-voyzu/
 ├─ .run/
 │  ├─ voyzu/
-│  ├─ voyzu-packages/
+│  ├─ packages/
 │  └─ package.json
 ├─ voyzu-package-repos/
 │  └─ voyzu-packages/
@@ -46,7 +46,7 @@ Voyzu operations are exposed as project-local npm scripts:
 
 ```shell
 npm run voyzu:initialize
-npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git @voyzu-packages/ice-creams
+npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git @voyzu/ice-creams
 npm run voyzu:compose
 ```
 
@@ -92,12 +92,12 @@ repository:
 ```shell
 npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev
 npm run voyzu:initialize
-npm run voyzu:install-package -- @voyzu-packages/ice-creams --link
+npm run voyzu:install-package -- @voyzu/ice-creams --link
 npm run dev
 ```
 
 Voyzu is downloaded into `.run/voyzu`. Installed packages are linked from the
-working repository into `.run/voyzu-packages`, so package source edits are
+working repository into `.run/packages`, so package source edits are
 available to the Next.js development server immediately.
 
 ## Requirements

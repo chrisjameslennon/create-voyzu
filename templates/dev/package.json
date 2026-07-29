@@ -6,8 +6,8 @@
     "voyzu/apps/*",
     "voyzu/packages/*",
     "voyzu/packages/@voyzu/*",
-    "voyzu-packages/*",
-    "voyzu-packages/@*/*"
+    "packages/*",
+    "packages/@*/*"
   ],
   "scripts": {
     "dev": "npm --prefix voyzu run dev",

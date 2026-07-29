@@ -259,7 +259,7 @@ async function createVirginInstall(options) {
 
   const runtimeDirectory = join(targetDirectory, ".run");
   const platformDirectory = join(runtimeDirectory, "voyzu");
-  const installedPackagesDirectory = join(runtimeDirectory, "voyzu-packages");
+  const installedPackagesDirectory = join(runtimeDirectory, "packages");
   const packageRepositoriesDirectory = join(
     targetDirectory,
     "voyzu-package-repos",
@@ -349,7 +349,7 @@ async function createDevelopmentRuntime(options) {
   const platformDirectory = join(runtimeDirectory, "voyzu");
   const installedPackagesDirectory = join(
     runtimeDirectory,
-    "voyzu-packages",
+    "packages",
   );
 
   if (!(await pathExists(join(packagesRoot, "package.json")))) {
@@ -367,9 +367,9 @@ async function createDevelopmentRuntime(options) {
     );
   }
 
-  if (!(await pathExists(join(packagesRoot, "voyzu-packages")))) {
+  if (!(await pathExists(join(packagesRoot, "packages")))) {
     throw new Error(
-      `No voyzu-packages directory found in: ${packagesRoot}`,
+      `No packages directory found in: ${packagesRoot}`,
     );
   }
 
@@ -436,7 +436,7 @@ async function createDevelopmentRuntime(options) {
     console.log("");
     console.log("Run:");
     console.log("  npm run voyzu:initialize");
-    console.log("  npm run voyzu:install-package -- @voyzu-packages/ice-creams --link");
+    console.log("  npm run voyzu:install-package -- @voyzu/ice-creams --link");
     console.log("  npm run dev");
   } catch (error) {
     await rm(runtimeDirectory, { recursive: true, force: true });

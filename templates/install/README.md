@@ -74,10 +74,10 @@ npm run voyzu:initialize
 Install a package by its npm name:
 
 ```shell
-npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git @voyzu-packages/ice-creams
+npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git @voyzu/ice-creams
 ```
 
-The command copies the package into `.run/voyzu-packages`, installs its npm
+The command copies the package into `.run/packages`, installs its npm
 dependencies, runs the ordered SQL declared by `voyzu.package.ts`, and
 recomposes the application.
 
@@ -90,5 +90,5 @@ npm run voyzu:install-package
 Run a package script:
 
 ```shell
-npm run voyzu:run -- @voyzu-packages/ice-creams sampleData
+npm run voyzu:run -- @voyzu/ice-creams sampleData
 ```
