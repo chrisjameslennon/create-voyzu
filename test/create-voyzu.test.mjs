@@ -62,9 +62,7 @@ try {
     "packages/@voyzu/cli/package.json": JSON.stringify({
       name: "@voyzu/cli",
       private: true,
-      bin: { voyzu: "./bin/voyzu.mjs" },
     }),
-    "packages/@voyzu/cli/bin/voyzu.mjs": "#!/usr/bin/env node\n",
   });
   await createRepository(packagesRepository, {
     "package.json": JSON.stringify({ name: "voyzu-packages", private: true }),
@@ -92,7 +90,6 @@ try {
     ".run/voyzu/.git",
     ".run/voyzu-packages",
     "voyzu-package-repos/voyzu-packages/.git",
-    ".env.development",
     ".env.local",
     "voyzu.instance.config.ts",
     "package.json",
@@ -114,10 +111,16 @@ try {
     await readFile(join(generatedProject, "package.json"), "utf8"),
   );
   if (
-    rootPackage.scripts.dev !== "npm --prefix .run run dev"
-    || rootPackage.workspaces[0] !== ".run/voyzu/packages/@voyzu/cli"
+    rootPackage.scripts["voyzu:dev"] !== "npm --prefix .run/voyzu run dev"
+    || rootPackage.scripts["voyzu:initialize"]
+      !== "npm --prefix .run/voyzu run voyzu:initialize"
+    || rootPackage.scripts["voyzu:install"]
+      !== "npm --prefix .run/voyzu run voyzu:install --"
+    || rootPackage.scripts["voyzu:install-package"]
+      !== "npm --prefix .run/voyzu run voyzu:install-package --"
+    || rootPackage.workspaces !== undefined
   ) {
-    throw new Error("Root package.json does not expose the project-local CLI/runtime.");
+    throw new Error("Root package.json does not expose the Voyzu package commands.");
   }
 
   const runtimePackage = JSON.parse(
@@ -135,6 +138,13 @@ try {
   if (!localEnv.includes("CHANGE_ME") || /password@/.test(localEnv)) {
     throw new Error(".env.local does not use safe placeholder values.");
   }
+  const authSecret = localEnv.match(/^VOYZU_AUTH_SECRET=(.+)$/m)?.[1];
+  if (
+    !authSecret
+    || Buffer.from(authSecret, "base64url").length < 32
+  ) {
+    throw new Error(".env.local does not contain a generated authentication secret.");
+  }
 
   await run(
     process.execPath,
@@ -148,10 +158,9 @@ try {
   );
 
   const expectedDevelopmentPaths = [
-    ".dev/package.json",
-    ".dev/voyzu/package.json",
-    ".dev/voyzu-packages",
-    ".env.development",
+    ".run/package.json",
+    ".run/voyzu/package.json",
+    ".run/voyzu-packages",
     ".env.local",
     "voyzu.instance.config.ts",
   ];
@@ -160,12 +169,12 @@ try {
       throw new Error(`Development installation did not create ${path}.`);
     }
   }
-  if (await pathExists(join(packagesRepository, ".dev/voyzu/.git"))) {
+  if (await pathExists(join(packagesRepository, ".run/voyzu/.git"))) {
     throw new Error("Development installation retained the nested Voyzu Git repository.");
   }
 
   const developmentPackage = JSON.parse(
-    await readFile(join(packagesRepository, ".dev/package.json"), "utf8"),
+    await readFile(join(packagesRepository, ".run/package.json"), "utf8"),
   );
   if (
     developmentPackage.voyzu.mode !== "development"

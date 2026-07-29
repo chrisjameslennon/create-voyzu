@@ -13,8 +13,14 @@
     "dev": "npm --prefix voyzu run dev",
     "build": "npm --prefix voyzu run build",
     "typecheck": "npm --prefix voyzu run typecheck",
-    "compose": "voyzu compose",
-    "voyzu": "voyzu"
+    "voyzu:add-repo": "npm --prefix voyzu run voyzu:add-repo --",
+    "voyzu:install": "npm --prefix voyzu run voyzu:install --",
+    "voyzu:refresh-repos": "npm --prefix voyzu run voyzu:refresh-repos",
+    "voyzu:refresh-repo": "npm --prefix voyzu run voyzu:refresh-repo --",
+    "voyzu:initialize": "npm --prefix voyzu run voyzu:initialize",
+    "voyzu:install-package": "npm --prefix voyzu run voyzu:install-package --",
+    "voyzu:compose": "npm --prefix voyzu run voyzu:compose",
+    "voyzu:run": "npm --prefix voyzu run voyzu:run --"
   },
   "voyzu": {
     "mode": "development",

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import {
   access,
   mkdir,
@@ -204,6 +205,12 @@ function jsonStringTemplateValue(value) {
   return JSON.stringify(value).slice(1, -1);
 }
 
+async function renderEnvironmentTemplate() {
+  return renderTemplate("install", "env.local", {
+    VOYZU_AUTH_SECRET: randomBytes(32).toString("base64url"),
+  });
+}
+
 async function installDependencies(directory, label) {
   if (!(await pathExists(join(directory, "package.json")))) {
     console.log(`Skipping ${label} dependency installation (no package.json).`);
@@ -311,13 +318,8 @@ async function createVirginInstall(options) {
     );
 
     await writeFile(
-      join(targetDirectory, ".env.development"),
-      await renderTemplate("install", "env.development", {}),
-      { encoding: "utf8", flag: "wx" },
-    );
-    await writeFile(
       join(targetDirectory, ".env.local"),
-      await renderTemplate("install", "env.local", {}),
+      await renderEnvironmentTemplate(),
       { encoding: "utf8", flag: "wx" },
     );
     await writeFile(
@@ -326,19 +328,15 @@ async function createVirginInstall(options) {
       { encoding: "utf8", flag: "wx" },
     );
 
-    if (!options.skipInstall) {
-      await installDependencies(targetDirectory, "Voyzu project CLI");
-    }
-
     console.log("Initialising the generated project Git repository...");
     await run("git", ["init", "--initial-branch=main"], { cwd: targetDirectory });
 
     console.log("");
     console.log("Voyzu created successfully.");
     console.log("");
-    console.log(`  cd ${options.target}`);
-    console.log("  edit .env.local");
-    console.log("  npm run dev");
+    console.log(
+      "Refer to the Voyzu installation documentation for configuration and next steps.",
+    );
   } catch (error) {
     await rm(targetDirectory, { recursive: true, force: true });
     throw error;
@@ -347,10 +345,10 @@ async function createVirginInstall(options) {
 
 async function createDevelopmentRuntime(options) {
   const packagesRoot = resolve(options.target || process.cwd());
-  const developmentDirectory = join(packagesRoot, ".dev");
-  const platformDirectory = join(developmentDirectory, "voyzu");
+  const runtimeDirectory = join(packagesRoot, ".run");
+  const platformDirectory = join(runtimeDirectory, "voyzu");
   const installedPackagesDirectory = join(
-    developmentDirectory,
+    runtimeDirectory,
     "voyzu-packages",
   );
 
@@ -375,18 +373,18 @@ async function createDevelopmentRuntime(options) {
     );
   }
 
-  if (await pathExists(developmentDirectory)) {
+  if (await pathExists(runtimeDirectory)) {
     if (!options.force) {
       throw new Error(
-        `${developmentDirectory} already exists. Run again with --force to recreate it.`,
+        `${runtimeDirectory} already exists. Run again with --force to recreate it.`,
       );
     }
 
-    await rm(developmentDirectory, { recursive: true, force: true });
+    await rm(runtimeDirectory, { recursive: true, force: true });
   }
 
   try {
-    await mkdir(developmentDirectory, { recursive: true });
+    await mkdir(runtimeDirectory, { recursive: true });
     await mkdir(installedPackagesDirectory, { recursive: true });
 
     await cloneDevelopmentRepository({
@@ -397,7 +395,7 @@ async function createDevelopmentRuntime(options) {
     });
 
     await writeFile(
-      join(developmentDirectory, "package.json"),
+      join(runtimeDirectory, "package.json"),
       await renderTemplate("dev", "package.json", {
         PROJECT_NAME: jsonStringTemplateValue(basename(packagesRoot)),
         VOYZU_REPOSITORY: jsonStringTemplateValue(
@@ -411,18 +409,14 @@ async function createDevelopmentRuntime(options) {
     );
 
     await writeFile(
-      join(developmentDirectory, "README.md"),
+      join(runtimeDirectory, "README.md"),
       await renderTemplate("dev", "README.md", {}),
       "utf8",
     );
 
     await writeFileIfMissing(
-      join(packagesRoot, ".env.development"),
-      await renderTemplate("install", "env.development", {}),
-    );
-    await writeFileIfMissing(
       join(packagesRoot, ".env.local"),
-      await renderTemplate("install", "env.local", {}),
+      await renderEnvironmentTemplate(),
     );
     await writeFileIfMissing(
       join(packagesRoot, "voyzu.instance.config.ts"),
@@ -430,7 +424,7 @@ async function createDevelopmentRuntime(options) {
     );
 
     if (!options.skipInstall) {
-      await installDependencies(developmentDirectory, "Voyzu development runtime");
+      await installDependencies(runtimeDirectory, "Voyzu development runtime");
       await installDevelopmentWorkspaceDependencies(packagesRoot);
     }
 
@@ -441,10 +435,11 @@ async function createDevelopmentRuntime(options) {
     console.log("Installed development packages will link directly to this repository.");
     console.log("");
     console.log("Run:");
-    console.log("  npm run voyzu -- install @voyzu-packages/ice-creams --link");
+    console.log("  npm run voyzu:initialize");
+    console.log("  npm run voyzu:install-package -- @voyzu-packages/ice-creams --link");
     console.log("  npm run dev");
   } catch (error) {
-    await rm(developmentDirectory, { recursive: true, force: true });
+    await rm(runtimeDirectory, { recursive: true, force: true });
     throw error;
   }
 }
@@ -457,13 +452,13 @@ GitHub-based Voyzu installer and local package-development runtime.
 Commands:
   create-voyzu install <directory>  Create a deployable Voyzu installation
   create-voyzu <directory>          Alias for install
-  create-voyzu dev [packages-dir]   Create .dev for package development
+  create-voyzu dev [packages-dir]   Create .run for package development
 
 Options:
   --ref <branch-or-tag>             Voyzu Git ref (default: repository default)
   --packages-ref <branch-or-tag>    Voyzu Packages Git ref (default: repository default)
   --modules-ref <branch-or-tag>     Deprecated alias for --packages-ref
-  --force                           Recreate an existing .dev directory
+  --force                           Recreate an existing .run directory
   --skip-install                    Do not run npm install
 
 Environment:

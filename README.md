@@ -26,7 +26,6 @@ my-voyzu/
 │  └─ package.json
 ├─ voyzu-package-repos/
 │  └─ voyzu-packages/
-├─ .env.development
 ├─ .env.local
 ├─ package.json
 ├─ README.md
@@ -40,28 +39,31 @@ Set local database credentials in `.env.local`, then:
 
 ```shell
 cd my-voyzu
-npm run dev
+npm run voyzu:dev
 ```
 
-The project-local CLI requires no global install:
+Voyzu operations are exposed as project-local npm scripts:
 
 ```shell
-npm exec voyzu -- --help
-npm exec voyzu -- install @voyzu-packages/ice-creams
+npm run voyzu:initialize
+npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git @voyzu-packages/ice-creams
+npm run voyzu:compose
 ```
 
-The root environment and instance configuration files are installation-owned.
+The root environment file and instance configuration file are installation-owned.
 Neither create-voyzu nor the Voyzu CLI overwrites them after creation.
 
 ## Repository and package commands
 
 ```shell
-npm exec voyzu -- clone repo https://github.com/example/fred-packages.git
-npm exec voyzu -- pull-repos
-npm exec voyzu -- pull repo fred-packages
-npm exec voyzu -- install @fred-packages/example
-npm exec voyzu -- compose
-npm exec voyzu -- run @fred-packages/example sampleData
+npm run voyzu:add-repo -- https://github.com/example/fred-packages.git
+npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
+npm run voyzu:refresh
+npm run voyzu:refresh-repos
+npm run voyzu:refresh-repo -- fred-packages
+npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
+npm run voyzu:compose
+npm run voyzu:run -- @fred-packages/example sampleData
 ```
 
 ## Git refs and local testing
@@ -89,12 +91,13 @@ repository:
 
 ```shell
 npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev
-npm run voyzu -- install @voyzu-packages/ice-creams --link
+npm run voyzu:initialize
+npm run voyzu:install-package -- @voyzu-packages/ice-creams --link
 npm run dev
 ```
 
-Voyzu is downloaded into `.dev/voyzu`. Installed packages are linked from the
-working repository into `.dev/voyzu-packages`, so package source edits are
+Voyzu is downloaded into `.run/voyzu`. Installed packages are linked from the
+working repository into `.run/voyzu-packages`, so package source edits are
 available to the Next.js development server immediately.
 
 ## Requirements
