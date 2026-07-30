@@ -80,7 +80,6 @@ try {
       env: {
         ...process.env,
         VOYZU_REPOSITORY: platformRepository,
-        VOYZU_PACKAGES_REPOSITORY: packagesRepository,
       },
     },
   );
@@ -89,7 +88,7 @@ try {
     ".run/package.json",
     ".run/voyzu/.git",
     ".run/packages",
-    ".package-sources/voyzu-packages/.git",
+    ".package-sources",
     ".env.local",
     "voyzu.instance.config.ts",
     "package.json",

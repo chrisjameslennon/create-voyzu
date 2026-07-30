@@ -25,15 +25,14 @@ my-voyzu/
 │  ├─ packages/
 │  └─ package.json
 ├─ .package-sources/
-│  └─ voyzu-packages/
 ├─ .env.local
 ├─ package.json
 ├─ README.md
 └─ voyzu.instance.config.ts
 ```
 
-Voyzu and the official package repository are shallow Git clones. External
-packages are not installed automatically.
+Voyzu is a shallow Git clone. Package repositories are downloaded only when a
+package is explicitly installed.
 
 Set local database credentials in `.env.local`, then:
 
@@ -69,20 +68,15 @@ npm run voyzu:run-script -- @fred-packages/example sampleData
 ## Git refs and local testing
 
 ```shell
-create-voyzu install my-voyzu --ref v0.1.0 --packages-ref v0.1.0
+create-voyzu install my-voyzu --ref v0.1.0
 ```
 
 Environment overrides:
 
 ```text
 VOYZU_REPOSITORY
-VOYZU_PACKAGES_REPOSITORY
 VOYZU_REF
-VOYZU_PACKAGES_REF
 ```
-
-`VOYZU_MODULES_REPOSITORY`, `VOYZU_MODULES_REF`, and `--modules-ref` remain
-temporary compatibility aliases.
 
 ## Package development runtime
 

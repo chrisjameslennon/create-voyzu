@@ -33,11 +33,8 @@ Restart the web server after the command completes.
 
 ## Package repositories
 
-The official package repository is cloned into:
-
-```text
-.package-sources/voyzu-packages
-```
+`.package-sources` is initially empty. Repositories are downloaded when a
+package is explicitly installed or when `voyzu:add-repo` is run.
 
 Downloaded repositories expose packages beneath
 `packages/@publisher/package-name`. The `package.json` name must match that

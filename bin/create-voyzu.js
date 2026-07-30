@@ -17,14 +17,7 @@ import { fileURLToPath } from "node:url";
 const DEFAULT_VOYZU_REPOSITORY =
   process.env.VOYZU_REPOSITORY ||
   "https://github.com/chrisjameslennon/voyzu.git";
-const DEFAULT_PACKAGES_REPOSITORY =
-  process.env.VOYZU_PACKAGES_REPOSITORY ||
-  process.env.VOYZU_MODULES_REPOSITORY ||
-  "https://github.com/chrisjameslennon/voyzu-packages.git";
 const DEFAULT_VOYZU_REF = process.env.VOYZU_REF;
-const DEFAULT_PACKAGES_REF =
-  process.env.VOYZU_PACKAGES_REF ||
-  process.env.VOYZU_MODULES_REF;
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const TEMPLATES_ROOT = join(PACKAGE_ROOT, "templates");
 
@@ -89,7 +82,6 @@ function parseArguments(argv) {
     force: false,
     skipInstall: false,
     voyzuRef: DEFAULT_VOYZU_REF,
-    packagesRef: DEFAULT_PACKAGES_REF,
   };
 
   if (args[0] === "install" || args[0] === "dev") {
@@ -113,22 +105,6 @@ function parseArguments(argv) {
       options.voyzuRef = args.shift();
       if (!options.voyzuRef) {
         throw new Error("--ref requires a Git branch or tag.");
-      }
-      continue;
-    }
-
-    if (argument === "--modules-ref") {
-      options.packagesRef = args.shift();
-      if (!options.packagesRef) {
-        throw new Error("--modules-ref requires a Git branch or tag.");
-      }
-      continue;
-    }
-
-    if (argument === "--packages-ref") {
-      options.packagesRef = args.shift();
-      if (!options.packagesRef) {
-        throw new Error("--packages-ref requires a Git branch or tag.");
       }
       continue;
     }
@@ -244,7 +220,7 @@ async function writeFileIfMissing(path, contents) {
 async function createVirginInstall(options) {
   if (!options.target) {
     throw new Error(
-      "Usage: create-voyzu install <project-directory> [--ref <tag>] [--packages-ref <tag>]",
+      "Usage: create-voyzu install <project-directory> [--ref <tag>]",
     );
   }
 
@@ -264,10 +240,6 @@ async function createVirginInstall(options) {
     targetDirectory,
     ".package-sources",
   );
-  const packagesRepositoryDirectory = join(
-    packageSourcesDirectory,
-    "voyzu-packages",
-  );
 
   try {
     console.log(`Creating ${projectName}...`);
@@ -280,13 +252,6 @@ async function createVirginInstall(options) {
       ref: options.voyzuRef,
       targetDirectory: platformDirectory,
       label: "Voyzu",
-    });
-
-    await cloneLiveRepository({
-      repository: DEFAULT_PACKAGES_REPOSITORY,
-      ref: options.packagesRef,
-      targetDirectory: packagesRepositoryDirectory,
-      label: "Voyzu Packages",
     });
 
     await writeFile(
@@ -444,16 +409,12 @@ Commands:
 
 Options:
   --ref <branch-or-tag>             Voyzu Git ref (default: repository default)
-  --packages-ref <branch-or-tag>    Voyzu Packages Git ref (default: repository default)
-  --modules-ref <branch-or-tag>     Deprecated alias for --packages-ref
   --force                           Recreate an existing .run directory
   --skip-install                    Do not run npm install
 
 Environment:
   VOYZU_REPOSITORY                  Override the Voyzu Git repository URL
-  VOYZU_PACKAGES_REPOSITORY         Override the Voyzu Packages repository URL
   VOYZU_REF                         Override the default Voyzu Git ref
-  VOYZU_PACKAGES_REF                Override the default packages Git ref
 `);
 }
 
