@@ -36,8 +36,12 @@ Restart the web server after the command completes.
 The official package repository is cloned into:
 
 ```text
-voyzu-package-repos/voyzu-packages
+.package-sources/voyzu-packages
 ```
+
+Downloaded repositories expose packages beneath
+`packages/@publisher/package-name`. The `package.json` name must match that
+scope and directory.
 
 Clone another package repository:
 
@@ -90,5 +94,5 @@ npm run voyzu:install-package
 Run a package script:
 
 ```shell
-npm run voyzu:run -- @voyzu/ice-creams sampleData
+npm run voyzu:run-script -- @voyzu/ice-creams sampleData
 ```

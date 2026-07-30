@@ -24,7 +24,7 @@ my-voyzu/
 │  ├─ voyzu/
 │  ├─ packages/
 │  └─ package.json
-├─ voyzu-package-repos/
+├─ .package-sources/
 │  └─ voyzu-packages/
 ├─ .env.local
 ├─ package.json
@@ -63,7 +63,7 @@ npm run voyzu:refresh-repos
 npm run voyzu:refresh-repo -- fred-packages
 npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
 npm run voyzu:compose
-npm run voyzu:run -- @fred-packages/example sampleData
+npm run voyzu:run-script -- @fred-packages/example sampleData
 ```
 
 ## Git refs and local testing
@@ -86,19 +86,24 @@ temporary compatibility aliases.
 
 ## Package development runtime
 
-Run the development bootstrap from the root of a `voyzu-packages` working
+Run the development bootstrap from the root of a Voyzu package-development
 repository:
 
 ```shell
 npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev
 npm run voyzu:initialize
-npm run voyzu:install-package -- @voyzu/ice-creams --link
+npm run voyzu:link-package -- @voyzu/ice-creams
 npm run dev
 ```
 
-Voyzu is downloaded into `.run/voyzu`. Installed packages are linked from the
-working repository into `.run/packages`, so package source edits are
-available to the Next.js development server immediately.
+If the root `package.json` or `packages/` directory does not exist,
+`create-voyzu dev` creates it. Existing files and package source are preserved.
+
+Voyzu is downloaded into `.run/voyzu`. `voyzu:link-package` links packages from
+the working repository's `packages` directory into `.run/packages`, so package
+source edits are available to the Next.js development server immediately.
+Git-installed packages remain copies in development, just as they are in
+production.
 
 ## Requirements
 

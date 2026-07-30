@@ -8,7 +8,6 @@
     "prestart": "npm run voyzu:build",
     "start": "npm --prefix .run/voyzu run start",
     "voyzu:start": "npm start",
-    "typecheck": "npm --prefix .run/voyzu run typecheck",
     "voyzu:add-repo": "npm --prefix .run/voyzu run voyzu:add-repo --",
     "voyzu:install": "npm --prefix .run/voyzu run voyzu:install --",
     "voyzu:refresh": "npm --prefix .run/voyzu run voyzu:refresh",
@@ -17,6 +16,6 @@
     "voyzu:initialize": "npm --prefix .run/voyzu run voyzu:initialize",
     "voyzu:install-package": "npm --prefix .run/voyzu run voyzu:install-package --",
     "voyzu:compose": "npm --prefix .run/voyzu run voyzu:compose",
-    "voyzu:run": "npm --prefix .run/voyzu run voyzu:run --"
+    "voyzu:run-script": "npm --prefix .run/voyzu run voyzu:run-script --"
   }
 }

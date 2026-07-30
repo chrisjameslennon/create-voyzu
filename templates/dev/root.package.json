@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "packages/@*/*",
+    ".run/voyzu/packages/@voyzu/*"
+  ],
+  "scripts": {
+    "create-dev": "npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev",
+    "re-install": "npm run create-dev -- --force",
+    "voyzu:initialize": "npm --prefix .run run voyzu:initialize",
+    "voyzu:install": "npm --prefix .run run voyzu:install --",
+    "voyzu:start": "npm start",
+    "voyzu:refresh": "npm --prefix .run run voyzu:refresh",
+    "voyzu:add-repo": "npm --prefix .run run voyzu:add-repo --",
+    "voyzu:refresh-repos": "npm --prefix .run run voyzu:refresh-repos",
+    "voyzu:refresh-repo": "npm --prefix .run run voyzu:refresh-repo --",
+    "voyzu:install-package": "npm --prefix .run run voyzu:install-package --",
+    "voyzu:compose": "npm --prefix .run run voyzu:compose",
+    "voyzu:run-script": "npm --prefix .run run voyzu:run-script --",
+    "voyzu:build": "npm run build",
+    "voyzu:dev": "npm run dev",
+    "voyzu:link-package": "npm --prefix .run run voyzu:link-package --",
+    "voyzu:link-packages": "npm --prefix .run run voyzu:link-packages",
+    "dev": "npm --prefix .run run dev",
+    "build": "npm --prefix .run run build",
+    "prestart": "npm run build",
+    "start": "npm --prefix .run run start"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "next": "^16.2.10",
+    "react": "^19.2.0",
+    "server-only": "^0.0.1",
+    "typescript": "^6.0.3"
+  }
+}

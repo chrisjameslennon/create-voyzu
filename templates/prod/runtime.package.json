@@ -12,11 +12,9 @@
   "scripts": {
     "dev": "npm --prefix voyzu run dev",
     "build": "npm --prefix voyzu run build",
-    "start": "npm --prefix voyzu run start",
-    "typecheck": "npm --prefix voyzu run typecheck"
+    "start": "npm --prefix voyzu run start"
   },
   "voyzu": {
-    "mode": "production",
-    "composedPackages": []
+    "mode": "production"
   }
 }

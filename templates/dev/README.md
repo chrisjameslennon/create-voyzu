@@ -1,14 +1,13 @@
 # Voyzu Packages Development Runtime
 
-This disposable development runtime installs Voyzu beneath `.run` and links installed
-packages directly to the parent `voyzu-packages` working tree.
+This disposable development runtime installs Voyzu beneath `.run`. Packages
+being developed are linked from the repository's `packages` workspace.
 
 Run development commands from the `voyzu-packages` repository root:
 
 ```shell
 npm run voyzu:initialize
-npm run voyzu:install-package -- @voyzu/ice-creams --link
+npm run voyzu:link-package -- @voyzu/ice-creams
 npm run dev
 npm run build
-npm run typecheck
 ```

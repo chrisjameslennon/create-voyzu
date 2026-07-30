@@ -65,7 +65,7 @@ try {
     }),
   });
   await createRepository(packagesRepository, {
-    "package.json": JSON.stringify({ name: "voyzu-packages", private: true }),
+    "package.json": JSON.stringify({ name: "example-packages", private: true }),
     "packages/@voyzu/example/package.json": JSON.stringify({
       name: "@voyzu/example",
       private: true,
@@ -89,7 +89,7 @@ try {
     ".run/package.json",
     ".run/voyzu/.git",
     ".run/packages",
-    "voyzu-package-repos/voyzu-packages/.git",
+    ".package-sources/voyzu-packages/.git",
     ".env.local",
     "voyzu.instance.config.ts",
     "package.json",
@@ -129,7 +129,7 @@ try {
   if (
     !runtimePackage.workspaces.includes("packages/@*/*")
     || runtimePackage.voyzu.mode !== "production"
-    || runtimePackage.voyzu.composedPackages.length !== 0
+    || runtimePackage.voyzu.composedPackages !== undefined
   ) {
     throw new Error("Runtime package.json is not the expected empty workspace.");
   }
@@ -158,6 +158,7 @@ try {
   );
 
   const expectedDevelopmentPaths = [
+    ".package-sources",
     ".run/package.json",
     ".run/voyzu/package.json",
     ".run/packages",
@@ -178,8 +179,11 @@ try {
   );
   if (
     developmentPackage.voyzu.mode !== "development"
-    || developmentPackage.voyzu.packageSource.directory !== ".."
     || !developmentPackage.workspaces.includes("packages/@*/*")
+    || developmentPackage.scripts["voyzu:link-package"]
+      !== "npm --prefix voyzu run voyzu:link-package --"
+    || developmentPackage.scripts["voyzu:link-packages"]
+      !== "npm --prefix voyzu run voyzu:link-packages"
   ) {
     throw new Error("Development runtime package.json is not configured for linked packages.");
   }

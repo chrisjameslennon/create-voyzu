@@ -206,7 +206,7 @@ function jsonStringTemplateValue(value) {
 }
 
 async function renderEnvironmentTemplate() {
-  return renderTemplate("install", "env.local", {
+  return renderTemplate("shared", "env.local", {
     VOYZU_AUTH_SECRET: randomBytes(32).toString("base64url"),
   });
 }
@@ -260,12 +260,12 @@ async function createVirginInstall(options) {
   const runtimeDirectory = join(targetDirectory, ".run");
   const platformDirectory = join(runtimeDirectory, "voyzu");
   const installedPackagesDirectory = join(runtimeDirectory, "packages");
-  const packageRepositoriesDirectory = join(
+  const packageSourcesDirectory = join(
     targetDirectory,
-    "voyzu-package-repos",
+    ".package-sources",
   );
   const packagesRepositoryDirectory = join(
-    packageRepositoriesDirectory,
+    packageSourcesDirectory,
     "voyzu-packages",
   );
 
@@ -273,7 +273,7 @@ async function createVirginInstall(options) {
     console.log(`Creating ${projectName}...`);
     await mkdir(runtimeDirectory, { recursive: true });
     await mkdir(installedPackagesDirectory, { recursive: true });
-    await mkdir(packageRepositoriesDirectory, { recursive: true });
+    await mkdir(packageSourcesDirectory, { recursive: true });
 
     await cloneLiveRepository({
       repository: DEFAULT_VOYZU_REPOSITORY,
@@ -291,7 +291,7 @@ async function createVirginInstall(options) {
 
     await writeFile(
       join(runtimeDirectory, "package.json"),
-      await renderTemplate("install", "runtime.package.json", {
+      await renderTemplate("prod", "runtime.package.json", {
         PROJECT_NAME: jsonStringTemplateValue(projectName),
       }),
       "utf8",
@@ -303,7 +303,7 @@ async function createVirginInstall(options) {
 
     await writeFile(
       join(targetDirectory, "package.json"),
-      await renderTemplate("install", "package.json", {
+      await renderTemplate("prod", "root.package.json", {
         PROJECT_NAME: jsonStringTemplateValue(projectName),
       }),
       "utf8",
@@ -311,7 +311,7 @@ async function createVirginInstall(options) {
 
     await writeFile(
       join(targetDirectory, "README.md"),
-      await renderTemplate("install", "README.md", {
+      await renderTemplate("prod", "README.md", {
         PROJECT_NAME: projectName,
       }),
       "utf8",
@@ -324,7 +324,7 @@ async function createVirginInstall(options) {
     );
     await writeFile(
       join(targetDirectory, "voyzu.instance.config.ts"),
-      await renderTemplate("install", "voyzu.instance.config.ts", {}),
+      await renderTemplate("shared", "voyzu.instance.config.ts", {}),
       { encoding: "utf8", flag: "wx" },
     );
 
@@ -346,32 +346,19 @@ async function createVirginInstall(options) {
 async function createDevelopmentRuntime(options) {
   const packagesRoot = resolve(options.target || process.cwd());
   const runtimeDirectory = join(packagesRoot, ".run");
+  const packageSourcesDirectory = join(packagesRoot, ".package-sources");
   const platformDirectory = join(runtimeDirectory, "voyzu");
   const installedPackagesDirectory = join(
     runtimeDirectory,
     "packages",
   );
 
-  if (!(await pathExists(join(packagesRoot, "package.json")))) {
-    throw new Error(
-      `No package.json found in the Voyzu Packages directory: ${packagesRoot}`,
-    );
-  }
-
-  const packagesPackageJson = JSON.parse(
-    await readFile(join(packagesRoot, "package.json"), "utf8"),
+  await mkdir(packagesRoot, { recursive: true });
+  await writeFileIfMissing(
+    join(packagesRoot, "package.json"),
+    await renderTemplate("dev", "root.package.json", {}),
   );
-  if (packagesPackageJson.name !== "voyzu-packages") {
-    throw new Error(
-      `create-voyzu dev must run from the voyzu-packages repository root: ${packagesRoot}`,
-    );
-  }
-
-  if (!(await pathExists(join(packagesRoot, "packages")))) {
-    throw new Error(
-      `No packages directory found in: ${packagesRoot}`,
-    );
-  }
+  await mkdir(join(packagesRoot, "packages"), { recursive: true });
 
   if (await pathExists(runtimeDirectory)) {
     if (!options.force) {
@@ -386,6 +373,7 @@ async function createDevelopmentRuntime(options) {
   try {
     await mkdir(runtimeDirectory, { recursive: true });
     await mkdir(installedPackagesDirectory, { recursive: true });
+    await mkdir(packageSourcesDirectory, { recursive: true });
 
     await cloneDevelopmentRepository({
       repository: DEFAULT_VOYZU_REPOSITORY,
@@ -396,7 +384,7 @@ async function createDevelopmentRuntime(options) {
 
     await writeFile(
       join(runtimeDirectory, "package.json"),
-      await renderTemplate("dev", "package.json", {
+      await renderTemplate("dev", "runtime.package.json", {
         PROJECT_NAME: jsonStringTemplateValue(basename(packagesRoot)),
         VOYZU_REPOSITORY: jsonStringTemplateValue(
           DEFAULT_VOYZU_REPOSITORY,
@@ -420,7 +408,7 @@ async function createDevelopmentRuntime(options) {
     );
     await writeFileIfMissing(
       join(packagesRoot, "voyzu.instance.config.ts"),
-      await renderTemplate("install", "voyzu.instance.config.ts", {}),
+      await renderTemplate("shared", "voyzu.instance.config.ts", {}),
     );
 
     if (!options.skipInstall) {
@@ -436,7 +424,7 @@ async function createDevelopmentRuntime(options) {
     console.log("");
     console.log("Run:");
     console.log("  npm run voyzu:initialize");
-    console.log("  npm run voyzu:install-package -- @voyzu/ice-creams --link");
+    console.log("  npm run voyzu:link-package -- @voyzu/ice-creams");
     console.log("  npm run dev");
   } catch (error) {
     await rm(runtimeDirectory, { recursive: true, force: true });
