@@ -8,6 +8,7 @@ Run development commands from the `voyzu-packages` repository root:
 ```shell
 npm run voyzu:initialize
 npm run voyzu:link-package -- @voyzu/ice-creams
+npm run voyzu:list-packages
 npm run dev
 npm run build
 ```

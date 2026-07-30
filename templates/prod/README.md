@@ -82,10 +82,16 @@ The command copies the package into `.run/packages`, installs its npm
 dependencies, runs the ordered SQL declared by `voyzu.package.ts`, and
 recomposes the application.
 
-Refresh every currently installed package from its cloned source:
+Reinstall one package from its already downloaded source:
 
 ```shell
-npm run voyzu:install-package
+npm run voyzu:install-package -- @voyzu/ice-creams
+```
+
+List the packages currently installed beneath `.run/packages`:
+
+```shell
+npm run voyzu:list-packages
 ```
 
 Run a package script:

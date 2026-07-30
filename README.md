@@ -61,6 +61,7 @@ npm run voyzu:refresh
 npm run voyzu:refresh-repos
 npm run voyzu:refresh-repo -- fred-packages
 npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
+npm run voyzu:list-packages
 npm run voyzu:compose
 npm run voyzu:run-script -- @fred-packages/example sampleData
 ```
