@@ -18,8 +18,7 @@ npm start
 npm run voyzu:start
 ```
 
-`.env.local` and `voyzu.instance.config.ts` belong to this installation. Voyzu
-commands never overwrite them.
+`.env.local` belongs to this installation. Voyzu commands never overwrite it.
 
 ## Update Voyzu
 

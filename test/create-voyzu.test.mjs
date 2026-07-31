@@ -90,7 +90,6 @@ try {
     ".run/packages",
     ".package-sources",
     ".env.local",
-    "voyzu.instance.config.ts",
     "package.json",
     "README.md",
   ];
@@ -162,7 +161,6 @@ try {
     ".run/voyzu/package.json",
     ".run/packages",
     ".env.local",
-    "voyzu.instance.config.ts",
   ];
   for (const path of expectedDevelopmentPaths) {
     if (!(await pathExists(join(packagesRepository, path)))) {

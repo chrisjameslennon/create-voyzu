@@ -27,8 +27,7 @@ my-voyzu/
 ├─ .package-sources/
 ├─ .env.local
 ├─ package.json
-├─ README.md
-└─ voyzu.instance.config.ts
+└─ README.md
 ```
 
 Voyzu is a shallow Git clone. Package repositories are downloaded only when a
@@ -49,8 +48,8 @@ npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git 
 npm run voyzu:compose
 ```
 
-The root environment file and instance configuration file are installation-owned.
-Neither create-voyzu nor the Voyzu CLI overwrites them after creation.
+The root environment file is installation-owned. Neither create-voyzu nor Voyzu
+package commands overwrite it after creation.
 
 ## Repository and package commands
 

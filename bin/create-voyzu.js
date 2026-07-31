@@ -287,12 +287,6 @@ async function createVirginInstall(options) {
       await renderEnvironmentTemplate(),
       { encoding: "utf8", flag: "wx" },
     );
-    await writeFile(
-      join(targetDirectory, "voyzu.instance.config.ts"),
-      await renderTemplate("shared", "voyzu.instance.config.ts", {}),
-      { encoding: "utf8", flag: "wx" },
-    );
-
     console.log("Initialising the generated project Git repository...");
     await run("git", ["init", "--initial-branch=main"], { cwd: targetDirectory });
 
@@ -371,11 +365,6 @@ async function createDevelopmentRuntime(options) {
       join(packagesRoot, ".env.local"),
       await renderEnvironmentTemplate(),
     );
-    await writeFileIfMissing(
-      join(packagesRoot, "voyzu.instance.config.ts"),
-      await renderTemplate("shared", "voyzu.instance.config.ts", {}),
-    );
-
     if (!options.skipInstall) {
       await installDependencies(runtimeDirectory, "Voyzu development runtime");
       await installDevelopmentWorkspaceDependencies(packagesRoot);
