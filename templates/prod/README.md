@@ -25,7 +25,7 @@ npm run voyzu:start
 Fast-forward the downloaded Voyzu platform and build it:
 
 ```shell
-npm run voyzu:refresh
+npm run voyzu:update
 ```
 
 Restart the web server after the command completes.
@@ -54,13 +54,13 @@ npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-pack
 Update all cloned package repositories:
 
 ```shell
-npm run voyzu:refresh-repos
+npm run voyzu:update-repos
 ```
 
 Update one repository:
 
 ```shell
-npm run voyzu:refresh-repo -- voyzu-packages
+npm run voyzu:update-repo -- voyzu-packages
 ```
 
 ## Packages

@@ -56,9 +56,9 @@ package commands overwrite it after creation.
 ```shell
 npm run voyzu:add-repo -- https://github.com/example/fred-packages.git
 npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
-npm run voyzu:refresh
-npm run voyzu:refresh-repos
-npm run voyzu:refresh-repo -- fred-packages
+npm run voyzu:update
+npm run voyzu:update-repos
+npm run voyzu:update-repo -- fred-packages
 npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
 npm run voyzu:list-packages
 npm run voyzu:compose
