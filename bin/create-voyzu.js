@@ -310,6 +310,10 @@ async function createDevelopmentRuntime(options) {
       PROJECT_NAME: jsonStringTemplateValue(basename(packagesRoot)),
     }),
   );
+  await writeFileIfMissing(
+    join(packagesRoot, ".gitignore"),
+    await renderTemplate("dev", "gitignore", {}),
+  );
   await mkdir(join(packagesRoot, "packages"), { recursive: true });
 
   if (await pathExists(runtimeDirectory)) {

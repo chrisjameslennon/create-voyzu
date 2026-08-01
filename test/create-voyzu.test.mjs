@@ -165,6 +165,7 @@ try {
     ".run/voyzu/package.json",
     ".run/packages",
     ".env.local",
+    ".gitignore",
   ];
   for (const path of expectedDevelopmentPaths) {
     if (!(await pathExists(join(packagesRepository, path)))) {
