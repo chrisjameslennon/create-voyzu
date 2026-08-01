@@ -153,10 +153,6 @@ async function cloneLiveRepository(options) {
 
 async function cloneDevelopmentRepository(options) {
   await cloneShallowRepository(options);
-  await rm(join(options.targetDirectory, ".git"), {
-    recursive: true,
-    force: true,
-  });
 }
 
 async function renderTemplate(templateDirectory, filename, replacements) {
@@ -373,7 +369,7 @@ async function createDevelopmentRuntime(options) {
     console.log("");
     console.log("Voyzu development runtime created successfully.");
     console.log("");
-    console.log("The downloaded Voyzu source has no nested Git repository.");
+    console.log("The downloaded Voyzu source is a refreshable shallow Git checkout.");
     console.log("Installed development packages will link directly to this repository.");
     console.log("");
     console.log("Run:");

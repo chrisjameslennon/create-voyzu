@@ -158,6 +158,7 @@ try {
   const expectedDevelopmentPaths = [
     ".package-sources",
     ".run/package.json",
+    ".run/voyzu/.git",
     ".run/voyzu/package.json",
     ".run/packages",
     ".env.local",
@@ -167,10 +168,6 @@ try {
       throw new Error(`Development installation did not create ${path}.`);
     }
   }
-  if (await pathExists(join(packagesRepository, ".run/voyzu/.git"))) {
-    throw new Error("Development installation retained the nested Voyzu Git repository.");
-  }
-
   const developmentPackage = JSON.parse(
     await readFile(join(packagesRepository, ".run/package.json"), "utf8"),
   );
