@@ -4,6 +4,7 @@
   "workspaces": [
     "packages/*",
     "packages/@*/*",
+    ".run/voyzu/lib/*",
     ".run/voyzu/packages/@voyzu/*"
   ],
   "scripts": {

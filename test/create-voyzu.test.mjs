@@ -59,7 +59,7 @@ const cliPath = resolve("bin/create-voyzu.js");
 try {
   await createRepository(platformRepository, {
     "package.json": JSON.stringify({ name: "voyzu", private: true }),
-    "packages/@voyzu/cli/package.json": JSON.stringify({
+    "lib/cli/package.json": JSON.stringify({
       name: "@voyzu/cli",
       private: true,
     }),

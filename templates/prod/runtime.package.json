@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "workspaces": [
     "voyzu/apps/*",
+    "voyzu/lib/*",
     "voyzu/packages/*",
     "voyzu/packages/@voyzu/*",
     "packages/*",
