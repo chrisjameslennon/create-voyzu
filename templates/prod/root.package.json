@@ -1,7 +1,6 @@
 {
   "name": "{{PROJECT_NAME}}",
-  "private": true,
-  "version": "0.1.0",
+  "description": "Voyzu runtime installation",
   "scripts": {
     "voyzu:dev": "npm --prefix .run/voyzu run dev",
     "voyzu:build": "npm --prefix .run/voyzu run build",

@@ -109,7 +109,10 @@ try {
     await readFile(join(generatedProject, "package.json"), "utf8"),
   );
   if (
-    rootPackage.scripts["voyzu:dev"] !== "npm --prefix .run/voyzu run dev"
+    rootPackage.name !== "generated"
+    || rootPackage.description !== "Voyzu runtime installation"
+    || Object.keys(rootPackage).sort().join(",") !== "description,name,scripts"
+    || rootPackage.scripts["voyzu:dev"] !== "npm --prefix .run/voyzu run dev"
     || rootPackage.scripts["voyzu:initialize"]
       !== "npm --prefix .run/voyzu run voyzu:initialize"
     || rootPackage.scripts["voyzu:install"]
