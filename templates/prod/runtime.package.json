@@ -13,7 +13,8 @@
   "scripts": {
     "dev": "npm --prefix voyzu run dev",
     "build": "npm --prefix voyzu run build",
-    "start": "npm --prefix voyzu run start"
+    "start": "npm --prefix voyzu run start",
+    "voyzu:build-api-reference": "npm --prefix voyzu run voyzu:build-api-reference"
   },
   "voyzu": {
     "mode": "production"
