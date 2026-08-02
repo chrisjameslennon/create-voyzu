@@ -178,12 +178,13 @@ try {
   if (
     developmentPackage.voyzu.mode !== "development"
     || !developmentPackage.workspaces.includes("packages/@*/*")
+    || developmentPackage.scripts.dev !== "npm --prefix voyzu run voyzu:dev"
     || developmentPackage.scripts["voyzu:link-package"]
       !== "npm --prefix voyzu run voyzu:link-package --"
     || developmentPackage.scripts["voyzu:link-packages"]
       !== "npm --prefix voyzu run voyzu:link-packages"
   ) {
-    throw new Error("Development runtime package.json is not configured for linked packages.");
+    throw new Error("Development runtime package.json is not configured for watched package copies.");
   }
 
   console.log("create-voyzu tests passed.");

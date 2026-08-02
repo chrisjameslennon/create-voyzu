@@ -11,7 +11,7 @@
     "packages/@*/*"
   ],
   "scripts": {
-    "dev": "npm --prefix voyzu run dev",
+    "dev": "npm --prefix voyzu run voyzu:dev",
     "build": "npm --prefix voyzu run build",
     "start": "npm --prefix voyzu run start",
     "voyzu:add-repo": "npm --prefix voyzu run voyzu:add-repo --",

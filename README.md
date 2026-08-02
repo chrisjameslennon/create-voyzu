@@ -93,11 +93,11 @@ npm run dev
 If the root `package.json` or `packages/` directory does not exist,
 `create-voyzu dev` creates it. Existing files and package source are preserved.
 
-Voyzu is downloaded into `.run/voyzu`. `voyzu:link-package` links packages from
-the working repository's `packages` directory into `.run/packages`, so package
-source edits are available to the Next.js development server immediately.
-Git-installed packages remain copies in development, just as they are in
-production.
+Voyzu is downloaded into `.run/voyzu`. Despite its retained name,
+`voyzu:link-package` installs a physical development copy from the working
+repository's `packages` directory into `.run/packages`. While `npm run dev` is
+running, Voyzu watches matching source packages and mirrors file changes into
+their runtime copies. Git-installed packages remain unchanged copies.
 
 ## Requirements
 
