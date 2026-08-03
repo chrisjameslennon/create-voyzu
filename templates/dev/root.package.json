@@ -10,6 +10,7 @@
     "voyzu:update-repos": "npm --prefix .run run voyzu:update-repos",
     "voyzu:update-repo": "npm --prefix .run run voyzu:update-repo --",
     "voyzu:install-package": "npm --prefix .run run voyzu:install-package --",
+    "voyzu:uninstall-package": "npm --prefix .run run voyzu:uninstall-package --",
     "voyzu:list-packages": "npm --prefix .run run voyzu:list-packages",
     "voyzu:compose": "npm --prefix .run run voyzu:compose",
     "voyzu:build-api-reference": "npm --prefix .run run voyzu:build-api-reference",

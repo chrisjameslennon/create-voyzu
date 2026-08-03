@@ -87,6 +87,15 @@ Reinstall one package from its already downloaded source:
 npm run voyzu:install-package -- @voyzu/ice-creams
 ```
 
+Uninstall a package after stopping the Voyzu web server:
+
+```shell
+npm run voyzu:uninstall-package -- @voyzu/ice-creams
+```
+
+The command runs the package's uninstall SQL, removes its copy from
+`.run/packages`, and recomposes the application. Package audit records remain.
+
 List the packages currently installed beneath `.run/packages`:
 
 ```shell
