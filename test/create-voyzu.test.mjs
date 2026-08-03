@@ -68,8 +68,14 @@ try {
     "package.json": JSON.stringify({ name: "example-packages", private: true }),
     "packages/@voyzu/example/package.json": JSON.stringify({
       name: "@voyzu/example",
+      repository: packagesRepository,
       private: true,
-      voyzu: { "voyzu-package": true, isActive: true },
+      voyzu: {
+        "voyzu-package": true,
+        allowInstall: true,
+        dependencies: [],
+        rootPaths: [],
+      },
     }),
   });
 
