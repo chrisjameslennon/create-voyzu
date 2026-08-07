@@ -7,13 +7,13 @@ Creates a Git-backed Voyzu installation directly from GitHub.
 PowerShell:
 
 ```powershell
-npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu install my-voyzu
+npm exec --yes --package=github:chrisjameslennon/create-voyzu -- create-voyzu install my-voyzu
 ```
 
 macOS, Linux, and other shells use the same command:
 
 ```shell
-npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu install my-voyzu
+npm exec --yes --package=github:chrisjameslennon/create-voyzu -- create-voyzu install my-voyzu
 ```
 
 The generated structure is:
@@ -65,18 +65,13 @@ npm run voyzu:compose
 npm run voyzu:run-script -- @fred-packages/example sampleData
 ```
 
-## Git refs and local testing
+## Platform source
 
-```shell
-create-voyzu install my-voyzu --ref v0.1.0
-```
+Production and development installations always download the `main` branch of
+the Voyzu repository. Branch and tag overrides are not supported.
 
-Environment overrides:
-
-```text
-VOYZU_REPOSITORY
-VOYZU_REF
-```
+`VOYZU_REPOSITORY` may be used to point local tests at another repository, but
+that repository must provide a `main` branch.
 
 ## Package development runtime
 
@@ -84,7 +79,7 @@ Run the development bootstrap from the root of a Voyzu package-development
 repository:
 
 ```shell
-npm exec --yes --package=github:chrisjameslennon/create-voyzu#main -- create-voyzu dev
+npm exec --yes --package=github:chrisjameslennon/create-voyzu -- create-voyzu dev
 npm run voyzu:initialize
 npm run voyzu:link-package -- @voyzu/ice-creams
 npm run dev

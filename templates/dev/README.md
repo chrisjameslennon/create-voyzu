@@ -3,6 +3,7 @@
 This disposable development runtime installs Voyzu beneath `.run`. Packages
 being developed are copied from the repository's `packages` workspace into
 `.run/packages` and kept synchronized while `npm run dev` is running.
+The disposable Voyzu platform checkout tracks only the `main` branch.
 
 Run development commands from the `voyzu-packages` repository root:
 

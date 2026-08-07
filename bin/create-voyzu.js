@@ -17,7 +17,7 @@ import { fileURLToPath } from "node:url";
 const DEFAULT_VOYZU_REPOSITORY =
   process.env.VOYZU_REPOSITORY ||
   "https://github.com/chrisjameslennon/voyzu.git";
-const DEFAULT_VOYZU_REF = process.env.VOYZU_REF;
+const VOYZU_BRANCH = "main";
 const PACKAGE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const TEMPLATES_ROOT = join(PACKAGE_ROOT, "templates");
 
@@ -81,7 +81,6 @@ function parseArguments(argv) {
     target: undefined,
     force: false,
     skipInstall: false,
-    voyzuRef: DEFAULT_VOYZU_REF,
   };
 
   if (args[0] === "install" || args[0] === "dev") {
@@ -101,14 +100,6 @@ function parseArguments(argv) {
       continue;
     }
 
-    if (argument === "--ref") {
-      options.voyzuRef = args.shift();
-      if (!options.voyzuRef) {
-        throw new Error("--ref requires a Git branch or tag.");
-      }
-      continue;
-    }
-
     if (argument.startsWith("--")) {
       throw new Error(`Unknown option: ${argument}`);
     }
@@ -125,23 +116,19 @@ function parseArguments(argv) {
 
 async function cloneShallowRepository({
   repository,
-  ref,
   targetDirectory,
   label,
 }) {
-  console.log(
-    `Downloading ${label} from GitHub (${ref || "repository default branch"})...`,
-  );
+  console.log(`Downloading ${label} from GitHub (${VOYZU_BRANCH})...`);
 
   const cloneArguments = [
     "clone",
     "--depth",
     "1",
+    "--branch",
+    VOYZU_BRANCH,
+    "--single-branch",
   ];
-
-  if (ref) {
-    cloneArguments.push("--branch", ref);
-  }
 
   cloneArguments.push(repository, targetDirectory);
   await run("git", cloneArguments);
@@ -211,7 +198,7 @@ async function writeFileIfMissing(path, contents) {
 async function createVirginInstall(options) {
   if (!options.target) {
     throw new Error(
-      "Usage: create-voyzu install <project-directory> [--ref <tag>]",
+      "Usage: create-voyzu install <project-directory>",
     );
   }
 
@@ -240,7 +227,6 @@ async function createVirginInstall(options) {
 
     await cloneLiveRepository({
       repository: DEFAULT_VOYZU_REPOSITORY,
-      ref: options.voyzuRef,
       targetDirectory: platformDirectory,
       label: "Voyzu",
     });
@@ -333,7 +319,6 @@ async function createDevelopmentRuntime(options) {
 
     await cloneDevelopmentRepository({
       repository: DEFAULT_VOYZU_REPOSITORY,
-      ref: options.voyzuRef,
       targetDirectory: platformDirectory,
       label: "Voyzu",
     });
@@ -344,9 +329,6 @@ async function createDevelopmentRuntime(options) {
         PROJECT_NAME: jsonStringTemplateValue(basename(packagesRoot)),
         VOYZU_REPOSITORY: jsonStringTemplateValue(
           DEFAULT_VOYZU_REPOSITORY,
-        ),
-        VOYZU_REF: jsonStringTemplateValue(
-          options.voyzuRef ?? "repository default",
         ),
       }),
       "utf8",
@@ -393,13 +375,11 @@ Commands:
   create-voyzu dev [packages-dir]   Create .run for package development
 
 Options:
-  --ref <branch-or-tag>             Voyzu Git ref (default: repository default)
   --force                           Recreate an existing .run directory
   --skip-install                    Do not run npm install
 
 Environment:
   VOYZU_REPOSITORY                  Override the Voyzu Git repository URL
-  VOYZU_REF                         Override the default Voyzu Git ref
 `);
 }
 

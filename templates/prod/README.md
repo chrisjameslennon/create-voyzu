@@ -2,6 +2,8 @@
 
 This is a Git-backed Voyzu installation.
 
+The platform runtime tracks only the Voyzu `main` branch.
+
 ## First run
 
 Set the PostgreSQL password and any local provider secrets in `.env.local`,

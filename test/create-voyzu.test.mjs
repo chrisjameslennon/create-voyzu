@@ -183,6 +183,7 @@ try {
   );
   if (
     developmentPackage.voyzu.mode !== "development"
+    || developmentPackage.voyzu.platform.branch !== "main"
     || !developmentPackage.workspaces.includes("packages/@*/*")
     || developmentPackage.scripts.dev !== "npm --prefix voyzu run voyzu:dev"
     || developmentPackage.scripts["voyzu:link-package"]

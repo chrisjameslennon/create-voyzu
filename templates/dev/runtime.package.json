@@ -32,7 +32,7 @@
     "mode": "development",
     "platform": {
       "repository": "{{VOYZU_REPOSITORY}}",
-      "ref": "{{VOYZU_REF}}",
+      "branch": "main",
       "directory": "voyzu"
     }
   }
