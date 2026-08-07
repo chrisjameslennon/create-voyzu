@@ -170,6 +170,29 @@ async function renderEnvironmentTemplate() {
   });
 }
 
+async function synchronizeRuntimePackage(runtimeDirectory, platformDirectory) {
+  const runtimePackagePath = join(runtimeDirectory, "package.json");
+  const platformPackagePath = join(platformDirectory, "package.json");
+  const [runtimePackage, platformPackage] = await Promise.all([
+    readFile(runtimePackagePath, "utf8").then(JSON.parse),
+    readFile(platformPackagePath, "utf8").then(JSON.parse),
+  ]);
+
+  runtimePackage.dependencies = { ...(platformPackage.dependencies ?? {}) };
+  runtimePackage.devDependencies = {
+    ...(platformPackage.devDependencies ?? {}),
+  };
+  if (platformPackage.packageManager) {
+    runtimePackage.packageManager = platformPackage.packageManager;
+  }
+
+  await writeFile(
+    runtimePackagePath,
+    `${JSON.stringify(runtimePackage, null, 2)}\n`,
+    "utf8",
+  );
+}
+
 async function installDependencies(directory, label) {
   if (!(await pathExists(join(directory, "package.json")))) {
     console.log(`Skipping ${label} dependency installation (no package.json).`);
@@ -238,6 +261,7 @@ async function createVirginInstall(options) {
       }),
       "utf8",
     );
+    await synchronizeRuntimePackage(runtimeDirectory, platformDirectory);
 
     if (!options.skipInstall) {
       await installDependencies(runtimeDirectory, "Voyzu runtime");
@@ -333,6 +357,7 @@ async function createDevelopmentRuntime(options) {
       }),
       "utf8",
     );
+    await synchronizeRuntimePackage(runtimeDirectory, platformDirectory);
 
     await writeFile(
       join(runtimeDirectory, "README.md"),
