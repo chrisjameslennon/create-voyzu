@@ -74,7 +74,8 @@ try {
         "voyzu-package": true,
         allowInstall: true,
         dependencies: [],
-        rootPaths: [],
+        pageRootPaths: [],
+        apiRootPaths: [],
       },
     }),
   });
