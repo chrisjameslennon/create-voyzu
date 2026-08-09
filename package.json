@@ -1,6 +1,6 @@
 {
   "name": "create-voyzu",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Create Voyzu installations and local module-development runtimes directly from GitHub.",
   "type": "module",
   "bin": {
