@@ -10,6 +10,7 @@ run development commands from that repository root:
 
 ```shell
 npm run voyzu:initialize
+npm run voyzu:create-package -- "@acme/customer orders"
 npm run voyzu:link-package -- @voyzu/ice-creams
 npm run voyzu:list-packages
 npm run dev

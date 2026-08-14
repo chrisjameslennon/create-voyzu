@@ -189,6 +189,8 @@ try {
     || developmentPackage.scripts.dev !== "npm --prefix voyzu run voyzu:dev"
     || developmentPackage.scripts["voyzu:link-package"]
       !== "npm --prefix voyzu run voyzu:link-package --"
+    || developmentPackage.scripts["voyzu:create-package"]
+      !== "npm --prefix voyzu run voyzu:create-package --"
     || developmentPackage.scripts["voyzu:link-packages"]
       !== "npm --prefix voyzu run voyzu:link-packages"
   ) {

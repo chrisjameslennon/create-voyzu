@@ -13,6 +13,7 @@
     "voyzu:uninstall-package": "npm --prefix .run run voyzu:uninstall-package --",
     "voyzu:list-packages": "npm --prefix .run run voyzu:list-packages",
     "voyzu:compose": "npm --prefix .run run voyzu:compose",
+    "voyzu:create-package": "npm --prefix .run run voyzu:create-package --",
     "voyzu:build-api-reference": "npm --prefix .run run voyzu:build-api-reference",
     "voyzu:run-script": "npm --prefix .run run voyzu:run-script --",
     "voyzu:build": "npm run build",
