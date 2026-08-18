@@ -21,6 +21,7 @@
     "voyzu:update-repo": "npm --prefix voyzu run voyzu:update-repo --",
     "voyzu:initialize": "npm --prefix voyzu run voyzu:initialize",
     "voyzu:install-package": "npm --prefix voyzu run voyzu:install-package --",
+    "voyzu:uninstall-package": "npm --prefix voyzu run voyzu:uninstall-package --",
     "voyzu:list-packages": "npm --prefix voyzu run voyzu:list-packages",
     "voyzu:create-package": "npm --prefix voyzu run voyzu:create-package --",
     "voyzu:link-package": "npm --prefix voyzu run voyzu:link-package --",
