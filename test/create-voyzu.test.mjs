@@ -138,6 +138,7 @@ try {
   if (
     !runtimePackage.workspaces.includes("packages/@*/*")
     || runtimePackage.voyzu !== undefined
+    || runtimePackage.devDependencies !== undefined
   ) {
     throw new Error("Runtime package.json is not the expected empty workspace.");
   }
@@ -191,6 +192,7 @@ try {
     || developmentRootPackage.voyzu.platform.branch !== "main"
     || developmentRootPackage.voyzu.platform.directory !== undefined
     || developmentPackage.voyzu !== undefined
+    || developmentPackage.devDependencies !== undefined
     || !developmentPackage.workspaces.includes("packages/@*/*")
     || developmentPackage.scripts.dev !== "npm --prefix voyzu run voyzu:dev"
     || developmentPackage.scripts["voyzu:link-package"]

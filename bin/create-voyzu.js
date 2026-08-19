@@ -205,9 +205,7 @@ async function synchronizeRuntimePackage(runtimeDirectory, platformDirectory) {
   ]);
 
   runtimePackage.dependencies = { ...(platformPackage.dependencies ?? {}) };
-  runtimePackage.devDependencies = {
-    ...(platformPackage.devDependencies ?? {}),
-  };
+  delete runtimePackage.devDependencies;
   if (platformPackage.packageManager) {
     runtimePackage.packageManager = platformPackage.packageManager;
   }
