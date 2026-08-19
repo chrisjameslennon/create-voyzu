@@ -62,6 +62,31 @@ async function pathExists(path) {
   }
 }
 
+async function ensureDevelopmentConfiguration(manifestPath) {
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const existing = manifest.voyzu;
+  if (existing && existing.mode !== "development") {
+    throw new Error("The root package.json voyzu.mode must be development for a development install.");
+  }
+  const platform = existing?.platform ?? {};
+  if (typeof platform !== "object" || Array.isArray(platform)) {
+    throw new Error("The root package.json voyzu.platform value must be an object.");
+  }
+  const platformConfiguration = { ...platform };
+  delete platformConfiguration.directory;
+  manifest.voyzu = {
+    ...existing,
+    mode: "development",
+    platform: {
+      ...platformConfiguration,
+      repository: platform.repository || DEFAULT_VOYZU_REPOSITORY,
+      branch: platform.branch || VOYZU_BRANCH,
+    },
+  };
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  return manifest.voyzu.platform;
+}
+
 async function directoryIsEmpty(directory) {
   try {
     return (await readdir(directory)).length === 0;
@@ -118,15 +143,16 @@ async function cloneShallowRepository({
   repository,
   targetDirectory,
   label,
+  branch = VOYZU_BRANCH,
 }) {
-  console.log(`Downloading ${label} from GitHub (${VOYZU_BRANCH})...`);
+  console.log(`Downloading ${label} from GitHub (${branch})...`);
 
   const cloneArguments = [
     "clone",
     "--depth",
     "1",
     "--branch",
-    VOYZU_BRANCH,
+    branch,
     "--single-branch",
   ];
 
@@ -318,7 +344,13 @@ async function createDevelopmentRuntime(options) {
     join(packagesRoot, "package.json"),
     await renderTemplate("dev", "root.package.json", {
       PROJECT_NAME: jsonStringTemplateValue(basename(packagesRoot)),
+      VOYZU_REPOSITORY: jsonStringTemplateValue(
+        DEFAULT_VOYZU_REPOSITORY,
+      ),
     }),
+  );
+  const platformConfiguration = await ensureDevelopmentConfiguration(
+    join(packagesRoot, "package.json"),
   );
   await writeFileIfMissing(
     join(packagesRoot, ".gitignore"),
@@ -342,7 +374,8 @@ async function createDevelopmentRuntime(options) {
     await mkdir(packageSourcesDirectory, { recursive: true });
 
     await cloneDevelopmentRepository({
-      repository: DEFAULT_VOYZU_REPOSITORY,
+      repository: platformConfiguration.repository,
+      branch: platformConfiguration.branch,
       targetDirectory: platformDirectory,
       label: "Voyzu",
     });
@@ -351,9 +384,6 @@ async function createDevelopmentRuntime(options) {
       join(runtimeDirectory, "package.json"),
       await renderTemplate("dev", "runtime.package.json", {
         PROJECT_NAME: jsonStringTemplateValue(basename(packagesRoot)),
-        VOYZU_REPOSITORY: jsonStringTemplateValue(
-          DEFAULT_VOYZU_REPOSITORY,
-        ),
       }),
       "utf8",
     );

@@ -118,7 +118,8 @@ try {
   if (
     rootPackage.name !== "generated"
     || rootPackage.description !== "Voyzu runtime installation"
-    || Object.keys(rootPackage).sort().join(",") !== "description,name,scripts"
+    || Object.keys(rootPackage).sort().join(",") !== "description,name,scripts,voyzu"
+    || rootPackage.voyzu.mode !== "production"
     || rootPackage.scripts["voyzu:dev"] !== "npm --prefix .run/voyzu run dev"
     || rootPackage.scripts["voyzu:initialize"]
       !== "npm --prefix .run/voyzu run voyzu:initialize"
@@ -136,8 +137,7 @@ try {
   );
   if (
     !runtimePackage.workspaces.includes("packages/@*/*")
-    || runtimePackage.voyzu.mode !== "production"
-    || runtimePackage.voyzu.composedPackages !== undefined
+    || runtimePackage.voyzu !== undefined
   ) {
     throw new Error("Runtime package.json is not the expected empty workspace.");
   }
@@ -179,12 +179,18 @@ try {
       throw new Error(`Development installation did not create ${path}.`);
     }
   }
+  const developmentRootPackage = JSON.parse(
+    await readFile(join(packagesRepository, "package.json"), "utf8"),
+  );
   const developmentPackage = JSON.parse(
     await readFile(join(packagesRepository, ".run/package.json"), "utf8"),
   );
   if (
-    developmentPackage.voyzu.mode !== "development"
-    || developmentPackage.voyzu.platform.branch !== "main"
+    developmentRootPackage.voyzu.mode !== "development"
+    || developmentRootPackage.voyzu.platform.repository !== platformRepository
+    || developmentRootPackage.voyzu.platform.branch !== "main"
+    || developmentRootPackage.voyzu.platform.directory !== undefined
+    || developmentPackage.voyzu !== undefined
     || !developmentPackage.workspaces.includes("packages/@*/*")
     || developmentPackage.scripts.dev !== "npm --prefix voyzu run voyzu:dev"
     || developmentPackage.scripts["voyzu:link-package"]

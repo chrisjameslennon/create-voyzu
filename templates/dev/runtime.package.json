@@ -29,13 +29,5 @@
     "voyzu:compose": "npm --prefix voyzu run voyzu:compose",
     "voyzu:build-api-reference": "npm --prefix voyzu run voyzu:build-api-reference",
     "voyzu:run-script": "npm --prefix voyzu run voyzu:run-script --"
-  },
-  "voyzu": {
-    "mode": "development",
-    "platform": {
-      "repository": "{{VOYZU_REPOSITORY}}",
-      "branch": "main",
-      "directory": "voyzu"
-    }
   }
 }

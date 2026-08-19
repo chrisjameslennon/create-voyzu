@@ -24,5 +24,12 @@
     "build": "npm --prefix .run run build",
     "prestart": "npm run build",
     "start": "npm --prefix .run run start"
+  },
+  "voyzu": {
+    "mode": "development",
+    "platform": {
+      "repository": "{{VOYZU_REPOSITORY}}",
+      "branch": "main"
+    }
   }
 }

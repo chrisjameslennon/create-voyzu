@@ -19,5 +19,8 @@
     "voyzu:compose": "npm --prefix .run/voyzu run voyzu:compose",
     "voyzu:build-api-reference": "npm --prefix .run/voyzu run voyzu:build-api-reference",
     "voyzu:run-script": "npm --prefix .run/voyzu run voyzu:run-script --"
+  },
+  "voyzu": {
+    "mode": "production"
   }
 }
