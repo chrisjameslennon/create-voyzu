@@ -58,7 +58,11 @@ const cliPath = resolve("bin/create-voyzu.js");
 
 try {
   await createRepository(platformRepository, {
-    "package.json": JSON.stringify({ name: "voyzu", private: true }),
+    "package.json": JSON.stringify({
+      name: "voyzu",
+      private: true,
+      allowScripts: { "esbuild@0.28.2": true },
+    }),
     "lib/runtime-tools/package.json": JSON.stringify({
       name: "@voyzu/runtime-tools",
       private: true,
@@ -120,13 +124,13 @@ try {
     || rootPackage.description !== "Voyzu runtime installation"
     || Object.keys(rootPackage).sort().join(",") !== "description,name,scripts,voyzu"
     || rootPackage.voyzu.mode !== "production"
-    || rootPackage.scripts["voyzu:dev"] !== "npm --prefix .run/voyzu run dev"
+    || rootPackage.scripts["voyzu:dev"] !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run dev"
     || rootPackage.scripts["voyzu:initialize"]
-      !== "npm --prefix .run/voyzu run voyzu:initialize"
+      !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run voyzu:initialize"
     || rootPackage.scripts["voyzu:install"]
-      !== "npm --prefix .run/voyzu run voyzu:install --"
+      !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run voyzu:install --"
     || rootPackage.scripts["voyzu:install-package"]
-      !== "npm --prefix .run/voyzu run voyzu:install-package --"
+      !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run voyzu:install-package --"
     || rootPackage.workspaces !== undefined
   ) {
     throw new Error("Root package.json does not expose the Voyzu package commands.");
@@ -139,6 +143,7 @@ try {
     !runtimePackage.workspaces.includes("packages/@*/*")
     || runtimePackage.voyzu !== undefined
     || runtimePackage.devDependencies !== undefined
+    || runtimePackage.allowScripts?.["esbuild@0.28.2"] !== true
   ) {
     throw new Error("Runtime package.json is not the expected empty workspace.");
   }
@@ -194,15 +199,16 @@ try {
     || developmentPackage.voyzu !== undefined
     || developmentPackage.devDependencies !== undefined
     || !developmentPackage.workspaces.includes("packages/@*/*")
-    || developmentPackage.scripts.dev !== "npm --prefix voyzu run voyzu:dev"
+    || developmentPackage.scripts.dev !== "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:dev"
     || developmentPackage.scripts["voyzu:link-package"]
-      !== "npm --prefix voyzu run voyzu:link-package --"
+      !== "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:link-package --"
     || developmentPackage.scripts["voyzu:create-package"]
-      !== "npm --prefix voyzu run voyzu:create-package --"
+      !== "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:create-package --"
     || developmentPackage.scripts["voyzu:uninstall-package"]
-      !== "npm --prefix voyzu run voyzu:uninstall-package --"
+      !== "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:uninstall-package --"
     || developmentPackage.scripts["voyzu:link-packages"]
-      !== "npm --prefix voyzu run voyzu:link-packages"
+      !== "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:link-packages"
+    || developmentPackage.allowScripts?.["esbuild@0.28.2"] !== true
   ) {
     throw new Error("Development runtime package.json is not configured for watched package copies.");
   }

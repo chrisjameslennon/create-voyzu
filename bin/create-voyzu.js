@@ -23,6 +23,10 @@ const TEMPLATES_ROOT = join(PACKAGE_ROOT, "templates");
 
 function run(command, args, options = {}) {
   return new Promise((resolvePromise, reject) => {
+    const env = { ...process.env, ...(options.env ?? {}) };
+    for (const name of Object.keys(env)) {
+      if (name.toLowerCase() === "npm_config_global_ignore_file") delete env[name];
+    }
     const useNpmCli = process.platform === "win32"
       && command === "npm"
       && process.env.npm_execpath;
@@ -34,6 +38,7 @@ function run(command, args, options = {}) {
       stdio: "inherit",
       shell: process.platform === "win32" && command === "npm" && !useNpmCli,
       ...options,
+      env,
     });
 
     child.on("error", reject);
@@ -206,6 +211,11 @@ async function synchronizeRuntimePackage(runtimeDirectory, platformDirectory) {
 
   runtimePackage.dependencies = { ...(platformPackage.dependencies ?? {}) };
   delete runtimePackage.devDependencies;
+  if (platformPackage.allowScripts) {
+    runtimePackage.allowScripts = { ...platformPackage.allowScripts };
+  } else {
+    delete runtimePackage.allowScripts;
+  }
   if (platformPackage.packageManager) {
     runtimePackage.packageManager = platformPackage.packageManager;
   }

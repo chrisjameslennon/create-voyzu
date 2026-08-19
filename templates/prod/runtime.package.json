@@ -11,9 +11,9 @@
     "packages/@*/*"
   ],
   "scripts": {
-    "dev": "npm --prefix voyzu run dev",
-    "build": "npm --prefix voyzu run build",
-    "start": "npm --prefix voyzu run start",
-    "voyzu:build-api-reference": "npm --prefix voyzu run voyzu:build-api-reference"
+    "dev": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run dev",
+    "build": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run build",
+    "start": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run start",
+    "voyzu:build-api-reference": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:build-api-reference"
   }
 }
