@@ -12,8 +12,8 @@ run development commands from that repository root:
 
 ```shell
 npm run voyzu:initialize
-npm run voyzu:create-package -- "@acme/customer orders"
-npm run voyzu:link-package -- @voyzu/ice-creams
+npm run voyzu:create-package "@acme/customer orders"
+npm run voyzu:link-package @voyzu/ice-creams
 npm run voyzu:list-packages
 npm run dev
 npm run build
@@ -23,5 +23,5 @@ Stop `npm run dev` before uninstalling a package so its runtime copy is no
 longer being mirrored, then run:
 
 ```shell
-npm run voyzu:uninstall-package -- @voyzu/ice-creams
+npm run voyzu:uninstall-package @voyzu/ice-creams
 ```

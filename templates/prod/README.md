@@ -44,13 +44,13 @@ scope and directory.
 Clone another package repository:
 
 ```shell
-npm run voyzu:add-repo -- https://github.com/example/fred-packages.git
+npm run voyzu:add-repo https://github.com/example/fred-packages.git
 ```
 
 Add a repository and immediately install one package from it:
 
 ```shell
-npm run voyzu:install -- https://github.com/example/fred-packages.git @fred-packages/example
+npm run voyzu:install https://github.com/example/fred-packages.git @fred-packages/example
 ```
 
 Update all cloned package repositories:
@@ -62,7 +62,7 @@ npm run voyzu:update-repos
 Update one repository:
 
 ```shell
-npm run voyzu:update-repo -- voyzu-packages
+npm run voyzu:update-repo voyzu-packages
 ```
 
 ## Packages
@@ -76,7 +76,7 @@ npm run voyzu:initialize
 Install a package by its npm name:
 
 ```shell
-npm run voyzu:install -- https://github.com/chrisjameslennon/voyzu-packages.git @voyzu/ice-creams
+npm run voyzu:install https://github.com/chrisjameslennon/voyzu-packages.git @voyzu/ice-creams
 ```
 
 The command copies the package into `.run/packages`, installs its npm
@@ -86,13 +86,13 @@ recomposes the application.
 Reinstall one package from its already downloaded source:
 
 ```shell
-npm run voyzu:install-package -- @voyzu/ice-creams
+npm run voyzu:install-package @voyzu/ice-creams
 ```
 
 Uninstall a package after stopping the Voyzu web server:
 
 ```shell
-npm run voyzu:uninstall-package -- @voyzu/ice-creams
+npm run voyzu:uninstall-package @voyzu/ice-creams
 ```
 
 The command runs the package's uninstall SQL, removes its copy from
@@ -107,5 +107,5 @@ npm run voyzu:list-packages
 Run a package script:
 
 ```shell
-npm run voyzu:run-script -- @voyzu/ice-creams sampleData
+npm run voyzu:run-script @voyzu/ice-creams sampleData
 ```

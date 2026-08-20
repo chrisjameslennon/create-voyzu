@@ -419,7 +419,7 @@ async function createDevelopmentRuntime(options) {
     console.log("");
     console.log("Configure the database connection in .env.local and run:");
     console.log("  npm run voyzu:initialize");
-    console.log("  npm run voyzu:link-package -- @voyzu/ice-creams");
+    console.log("  npm run voyzu:link-package @voyzu/ice-creams");
     console.log("  npm run dev");
   } catch (error) {
     await rm(runtimeDirectory, { recursive: true, force: true });
