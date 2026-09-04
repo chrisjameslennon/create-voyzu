@@ -12,7 +12,7 @@
     "voyzu:install-package": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:install-package --",
     "voyzu:uninstall-package": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:uninstall-package --",
     "voyzu:list-packages": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:list-packages",
-    "voyzu:compose": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:compose",
+    "voyzu:compose": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:compose --",
     "voyzu:create-package": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:create-package --",
     "voyzu:build-api-reference": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:build-api-reference",
     "voyzu:run-script": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:run-script --",
