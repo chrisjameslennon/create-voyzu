@@ -5,7 +5,6 @@
   "workspaces": [
     "voyzu/apps/*",
     "voyzu/lib/*",
-    "voyzu/components",
     "voyzu/packages/*",
     "voyzu/packages/@voyzu/*",
     "packages/*",
