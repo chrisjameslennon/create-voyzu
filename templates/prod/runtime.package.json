@@ -14,6 +14,6 @@
     "dev": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run dev",
     "build": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run build",
     "start": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run start",
-    "voyzu:build-api-reference": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:build-api-reference"
+    "voyzu:build-http-api-reference": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:build-http-api-reference"
   }
 }

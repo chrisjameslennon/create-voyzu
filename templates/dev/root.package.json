@@ -14,7 +14,7 @@
     "voyzu:list-packages": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:list-packages",
     "voyzu:compose": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:compose --",
     "voyzu:create-package": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:create-package --",
-    "voyzu:build-api-reference": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:build-api-reference",
+    "voyzu:build-http-api-reference": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:build-http-api-reference",
     "voyzu:run-script": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:run-script --",
     "voyzu:build": "node .run/voyzu/lib/runtime-tools/run-npm.mjs run build",
     "voyzu:dev": "node .run/voyzu/lib/runtime-tools/run-npm.mjs run dev",

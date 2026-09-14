@@ -27,7 +27,7 @@
     "voyzu:link-package": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:link-package --",
     "voyzu:link-packages": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:link-packages",
     "voyzu:compose": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:compose --",
-    "voyzu:build-api-reference": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:build-api-reference",
+    "voyzu:build-http-api-reference": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:build-http-api-reference",
     "voyzu:run-script": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:run-script --"
   }
 }

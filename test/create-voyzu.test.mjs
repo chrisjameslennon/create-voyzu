@@ -79,7 +79,6 @@ try {
         allowInstall: true,
         dependencies: [],
         pageRootPaths: [],
-        apiRootPaths: [],
       },
     }),
   });
