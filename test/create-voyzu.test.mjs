@@ -126,7 +126,7 @@ try {
     || rootPackage.voyzu.mode !== "production"
     || rootPackage.scripts["voyzu:dev"] !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run dev"
     || rootPackage.scripts["voyzu:initialize"]
-      !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run voyzu:initialize"
+      !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run voyzu:initialize --"
     || rootPackage.scripts["voyzu:install"]
       !== "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run/voyzu run voyzu:install --"
     || rootPackage.scripts["voyzu:install-package"]

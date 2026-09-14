@@ -2,7 +2,7 @@
   "name": "{{PROJECT_NAME}}",
   "description": "Voyzu package development",
   "scripts": {
-    "voyzu:initialize": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:initialize",
+    "voyzu:initialize": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:initialize --",
     "voyzu:install": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:install --",
     "voyzu:start": "node .run/voyzu/lib/runtime-tools/run-npm.mjs run start",
     "voyzu:update": "node .run/voyzu/lib/runtime-tools/run-npm.mjs --prefix .run run voyzu:update",

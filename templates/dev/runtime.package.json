@@ -19,7 +19,7 @@
     "voyzu:update": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:update",
     "voyzu:update-repos": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:update-repos",
     "voyzu:update-repo": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:update-repo --",
-    "voyzu:initialize": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:initialize",
+    "voyzu:initialize": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:initialize --",
     "voyzu:install-package": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:install-package --",
     "voyzu:uninstall-package": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:uninstall-package --",
     "voyzu:list-packages": "node voyzu/lib/runtime-tools/run-npm.mjs --prefix voyzu run voyzu:list-packages",
