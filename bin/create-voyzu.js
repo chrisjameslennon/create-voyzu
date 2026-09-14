@@ -77,13 +77,11 @@ async function ensureDevelopmentConfiguration(manifestPath) {
   if (typeof platform !== "object" || Array.isArray(platform)) {
     throw new Error("The root package.json voyzu.platform value must be an object.");
   }
-  const platformConfiguration = { ...platform };
-  delete platformConfiguration.directory;
   manifest.voyzu = {
     ...existing,
     mode: "development",
     platform: {
-      ...platformConfiguration,
+      ...platform,
       repository: platform.repository || DEFAULT_VOYZU_REPOSITORY,
       branch: platform.branch || VOYZU_BRANCH,
     },
